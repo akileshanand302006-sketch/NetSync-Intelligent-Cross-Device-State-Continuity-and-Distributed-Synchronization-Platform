@@ -1,0 +1,17 @@
+[project]
+name = "netsync-api"
+version = "0.1.0"
+description = "NetSync Backend API"
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+pythonpath = [".", "../networking_engine/src"]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
