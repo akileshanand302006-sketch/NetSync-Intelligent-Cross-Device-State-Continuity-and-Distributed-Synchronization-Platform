@@ -15,10 +15,13 @@ from app.api.v1.endpoints import (
     sync,
     transfers,
     network_lab,
+    system,
     ws,
 )
 
 api_router = APIRouter()
+
+api_router.include_router(system.router, prefix="/system", tags=["system"])
 
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(devices.router, prefix="/devices", tags=["devices"])

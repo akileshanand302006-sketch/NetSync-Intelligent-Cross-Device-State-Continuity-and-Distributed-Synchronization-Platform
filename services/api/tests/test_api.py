@@ -164,3 +164,40 @@ def test_auth_and_device_flow(client):
     )
     assert sync_res.status_code == 200
     assert sync_res.json()["version"] == 3
+
+
+def test_e2ee_clipboard_and_ttl(client):
+    """Verify Section 5.1 & ADR 0005: E2EE clipboard zero-knowledge storage and TTL auto-expiry."""
+    # 1. Login
+    email = "researcher@netsync.dev"
+    password = "SuperSecurePassword123!"
+    login_res = client.post("/api/v1/auth/login", json={"email": email, "password": password})
+    assert login_res.status_code == 200
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 2. Push E2EE encrypted item with TTL
+    encrypted_payload = {
+        "device_id": "test-device-uuid",
+        "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA=",  # Simulated ciphertext
+        "content_type": "text/plain",
+        "is_encrypted": True,
+        "iv_base64": "MDEyMzQ1Njc4OTAx",
+        "key_id": "master-device-key-v1",
+        "is_sensitive": True,
+        "ttl_seconds": 600,
+    }
+    clip_res = client.post("/api/v1/clipboard/", headers=headers, json=encrypted_payload)
+    assert clip_res.status_code == 201
+    clip_data = clip_res.json()
+    assert clip_data["is_encrypted"] is True
+    assert clip_data["is_sensitive"] is True
+    assert clip_data["key_id"] == "master-device-key-v1"
+    assert clip_data["expires_at"] is not None
+
+    # 3. Verify retrieved list includes it
+    list_res = client.get("/api/v1/clipboard/", headers=headers)
+    assert list_res.status_code == 200
+    items = list_res.json()
+    assert any(item["id"] == clip_data["id"] and item["is_encrypted"] for item in items)
+

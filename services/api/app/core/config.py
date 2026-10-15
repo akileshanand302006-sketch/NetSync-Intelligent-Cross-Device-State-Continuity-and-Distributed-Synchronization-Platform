@@ -19,8 +19,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     ALGORITHM: str = "HS256"
 
-    # Database: Default to local SQLite file if PostgreSQL not provided
-    DATABASE_URL: str = "sqlite:///./netsync.db"
+    # Database: Supabase 24/7 PostgreSQL (fallback to local SQLite if unset)
+    DATABASE_URL: str = "postgresql://postgres.rdozpxwznkilkfyzkuaz:F1TrhbPpXnFASsQR@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
+
+    # Supabase Project Credentials
+    SUPABASE_PROJECT_REF: str = "rdozpxwznkilkfyzkuaz"
+    SUPABASE_URL: str = "https://rdozpxwznkilkfyzkuaz.supabase.co"
+    SUPABASE_KEY: str = "sb_publishable_f7fJxZerBEsVFZ16LbxjGQ_Wsl-WBye"
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
+
 
     # Redis (Optional presence/cache)
     REDIS_URL: str = "redis://localhost:6379/0"

@@ -69,6 +69,31 @@ from app.network_lab.socket_toolkit import (
     run_tcp_echo_test,
     run_udp_echo_test,
 )
+from app.network_lab.tier_a_labs import (
+    trace_life_of_request,
+    simulate_congestion_control,
+    simulate_reliable_transport,
+    calculate_impairment_impact,
+    simulate_dns_resolution_hierarchy,
+    calculate_nodal_delay_and_bufferbloat,
+)
+from app.network_lab.tier_b_labs import (
+    simulate_as_path_trace,
+    run_dijkstra_shortest_path,
+    simulate_bellman_ford_count_to_infinity,
+    calculate_vlsm_subnets,
+    generate_eui64_ipv6,
+    simulate_csmacd_backoff,
+    simulate_csmaca_hidden_terminal,
+    calculate_kademlia_distance,
+    run_marzullo_ntp_filter,
+)
+from app.network_lab.tier_c_labs import (
+    simulate_router_architecture,
+    simulate_datacenter_fabric,
+    compare_http_protocols,
+    run_icmp_diagnostics,
+)
 
 router = APIRouter()
 
@@ -327,3 +352,285 @@ def execute_all_experiments(
 ):
     """Execute all 10 Capstone experiments and generate a comprehensive evaluation report."""
     return run_all_experiments()
+
+
+# -------------------------------------------------------------
+# Endpoints: Tier A Network Intelligence Labs (Section 6)
+# -------------------------------------------------------------
+class RequestTracerRequest(BaseModel):
+    url: str = Field("https://netsync.dev/api/v1/health")
+    client_ip: str = Field("192.168.1.105")
+    gateway_ip: str = Field("192.168.1.1")
+
+
+class CongestionSimulatorRequest(BaseModel):
+    algorithm: str = Field("reno", pattern="^(reno|cubic|bbr)$")
+    rtt_ms: float = Field(30.0, ge=1.0, le=500.0)
+    bandwidth_mbps: float = Field(100.0, ge=1.0, le=10000.0)
+    loss_rate: float = Field(0.02, ge=0.0, le=0.5)
+    buffer_packets: int = Field(60, ge=5, le=500)
+    total_rounds: int = Field(60, ge=10, le=200)
+
+
+class ReliableTransportRequest(BaseModel):
+    protocol: str = Field("go_back_n", pattern="^(stop_and_wait|go_back_n|selective_repeat)$")
+    window_size: int = Field(4, ge=1, le=16)
+    total_packets: int = Field(12, ge=1, le=50)
+    drop_packets: Optional[List[int]] = None
+    corrupt_packets: Optional[List[int]] = None
+
+
+class ImpairmentStudioRequest(BaseModel):
+    base_rtt_ms: float = Field(4.0, ge=0.1, le=100.0)
+    added_delay_ms: float = Field(60.0, ge=0.0, le=1000.0)
+    jitter_ms: float = Field(12.0, ge=0.0, le=200.0)
+    loss_percent: float = Field(5.0, ge=0.0, le=50.0)
+    bandwidth_cap_mbps: float = Field(20.0, ge=0.1, le=1000.0)
+    file_size_mb: float = Field(100.0, ge=0.1, le=5000.0)
+
+
+class DnsStudioRequest(BaseModel):
+    domain: str = Field("netsync.dev")
+
+
+class NodalDelayRequest(BaseModel):
+    packet_size_bytes: int = Field(1500, ge=64, le=9000)
+    link_rate_mbps: float = Field(100.0, ge=1.0, le=10000.0)
+    distance_km: float = Field(500.0, ge=0.1, le=40000.0)
+    propagation_speed_km_s: float = Field(200000.0, ge=10000.0, le=300000.0)
+    processing_delay_us: float = Field(10.0, ge=0.0, le=10000.0)
+    current_queue_packets: int = Field(25, ge=0, le=1000)
+    unloaded_ping_ms: float = Field(12.0, ge=0.1, le=500.0)
+    loaded_ping_ms: float = Field(85.0, ge=0.1, le=2000.0)
+
+
+@router.post("/tier-a/request-tracer")
+def api_trace_request(
+    req: RequestTracerRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A1: Trace full life-of-a-request across DHCP, ARP, DNS, TCP, TLS, and HTTP."""
+    return trace_life_of_request(
+        url=req.url,
+        client_ip=req.client_ip,
+        gateway_ip=req.gateway_ip,
+    )
+
+
+@router.post("/tier-a/congestion-simulator")
+def api_simulate_congestion(
+    req: CongestionSimulatorRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A2: Simulate TCP Reno, Cubic, and BBR congestion control state machines."""
+    return simulate_congestion_control(
+        algorithm=req.algorithm,
+        rtt_ms=req.rtt_ms,
+        bandwidth_mbps=req.bandwidth_mbps,
+        loss_rate=req.loss_rate,
+        buffer_packets=req.buffer_packets,
+        total_rounds=req.total_rounds,
+    )
+
+
+@router.post("/tier-a/reliable-transport")
+def api_simulate_transport(
+    req: ReliableTransportRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A3: Simulate Stop-and-Wait, Go-Back-N, and Selective Repeat sliding window ARQ."""
+    return simulate_reliable_transport(
+        protocol=req.protocol,
+        window_size=req.window_size,
+        total_packets=req.total_packets,
+        drop_packets=req.drop_packets,
+        corrupt_packets=req.corrupt_packets,
+    )
+
+
+@router.post("/tier-a/impairment-studio")
+def api_calculate_impairment(
+    req: ImpairmentStudioRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A4: Model throughput degradation and latency under link impairments."""
+    return calculate_impairment_impact(
+        base_rtt_ms=req.base_rtt_ms,
+        added_delay_ms=req.added_delay_ms,
+        jitter_ms=req.jitter_ms,
+        loss_percent=req.loss_percent,
+        bandwidth_cap_mbps=req.bandwidth_cap_mbps,
+        file_size_mb=req.file_size_mb,
+    )
+
+
+@router.post("/tier-a/dns-studio")
+def api_dns_hierarchy(
+    req: DnsStudioRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A5: RFC 1035 root-to-authoritative recursive resolution and cache audit."""
+    return simulate_dns_resolution_hierarchy(domain=req.domain)
+
+
+@router.post("/tier-a/nodal-delay")
+def api_nodal_delay(
+    req: NodalDelayRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """A6: Decompose nodal delay (proc, queue, trans, prop) and grade bufferbloat."""
+    return calculate_nodal_delay_and_bufferbloat(
+        packet_size_bytes=req.packet_size_bytes,
+        link_rate_mbps=req.link_rate_mbps,
+        distance_km=req.distance_km,
+        propagation_speed_km_s=req.propagation_speed_km_s,
+        processing_delay_us=req.processing_delay_us,
+        current_queue_packets=req.current_queue_packets,
+        unloaded_ping_ms=req.unloaded_ping_ms,
+        loaded_ping_ms=req.loaded_ping_ms,
+    )
+
+
+# -------------------------------------------------------------
+# Endpoints: Tier B Network Intelligence Labs (Section 6)
+# -------------------------------------------------------------
+class VlsmRequest(BaseModel):
+    network_cidr: str = Field("192.168.0.0/24")
+    subnet_sizes: Optional[List[int]] = None
+
+
+class Eui64Request(BaseModel):
+    mac_address: str = Field("3A:8F:C2:59:E0:11")
+    prefix: str = Field("2001:db8:acad::")
+
+
+class KademliaRequest(BaseModel):
+    node_a_hex: str = Field("A1B2C3")
+    node_b_hex: str = Field("A1B2D5")
+
+
+@router.get("/tier-b/as-path")
+def api_as_path(
+    destination: str = "1.1.1.1",
+    current_user: User = Depends(get_lab_user),
+):
+    """B1: Trace AS-level autonomous system path & BGP attributes."""
+    return simulate_as_path_trace(destination_ip=destination)
+
+
+@router.get("/tier-b/dijkstra")
+def api_dijkstra(
+    source: str = "A",
+    current_user: User = Depends(get_lab_user),
+):
+    """B2: Run Dijkstra's Link-State shortest path tree algorithm."""
+    return run_dijkstra_shortest_path(source_node=source)
+
+
+@router.get("/tier-b/count-to-infinity")
+def api_count_to_infinity(
+    current_user: User = Depends(get_lab_user),
+):
+    """B2: Demonstrate Bellman-Ford count-to-infinity routing loop & poison reverse."""
+    return simulate_bellman_ford_count_to_infinity()
+
+
+@router.post("/tier-b/vlsm")
+def api_vlsm(
+    req: VlsmRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """B3: Calculate optimal Variable Length Subnet Masking (VLSM) allocations."""
+    return calculate_vlsm_subnets(network_cidr=req.network_cidr, subnet_sizes=req.subnet_sizes)
+
+
+@router.post("/tier-b/eui64")
+def api_eui64(
+    req: Eui64Request,
+    current_user: User = Depends(get_lab_user),
+):
+    """B3: Generate RFC 4291 Modified EUI-64 IPv6 interface identifier."""
+    return generate_eui64_ipv6(mac_address=req.mac_address, prefix=req.prefix)
+
+
+@router.get("/tier-b/csmacd")
+def api_csmacd(
+    collisions: int = 4,
+    current_user: User = Depends(get_lab_user),
+):
+    """B4: Simulate 802.3 CSMA/CD Truncated Binary Exponential Backoff."""
+    return simulate_csmacd_backoff(collisions=collisions)
+
+
+@router.get("/tier-b/csmaca")
+def api_csmaca(
+    current_user: User = Depends(get_lab_user),
+):
+    """B4: Simulate 802.11 RTS/CTS 4-way handshake solving hidden terminals."""
+    return simulate_csmaca_hidden_terminal()
+
+
+@router.post("/tier-b/kademlia-distance")
+def api_kademlia(
+    req: KademliaRequest,
+    current_user: User = Depends(get_lab_user),
+):
+    """B5: Compute Kademlia XOR metric distance and k-bucket index."""
+    return calculate_kademlia_distance(node_a_hex=req.node_a_hex, node_b_hex=req.node_b_hex)
+
+
+@router.get("/tier-b/marzullo-ntp")
+def api_marzullo(
+    current_user: User = Depends(get_lab_user),
+):
+    """B6: Execute RFC 5905 NTP Marzullo clock intersection algorithm."""
+    return run_marzullo_ntp_filter()
+
+
+# -------------------------------------------------------------
+# Endpoints: Tier C Deep Network Features (Section 6)
+# -------------------------------------------------------------
+@router.get("/tier-c/router-architecture")
+def api_router_architecture(
+    fabric_type: str = "crossbar",
+    input_ports: int = 4,
+    enable_voq: bool = False,
+    current_user: User = Depends(get_lab_user),
+):
+    """C1: Simulate router switching fabrics and Head-of-Line (HOL) blocking."""
+    return simulate_router_architecture(fabric_type=fabric_type, input_ports=input_ports, enable_voq=enable_voq)
+
+
+@router.get("/tier-c/datacenter-fabric")
+def api_datacenter_fabric(
+    spines: int = 4,
+    leafs: int = 8,
+    servers: int = 32,
+    current_user: User = Depends(get_lab_user),
+):
+    """C2: Evaluate 2-tier Clos Leaf-Spine datacenter fabric & ECMP hashing."""
+    return simulate_datacenter_fabric(spine_switches=spines, leaf_switches=leafs, servers_per_leaf=servers)
+
+
+@router.get("/tier-c/http-evolution")
+def api_http_evolution(
+    assets: int = 50,
+    rtt_ms: float = 40.0,
+    loss_rate: float = 2.0,
+    current_user: User = Depends(get_lab_user),
+):
+    """C3: Compare page load performance across HTTP/1.1, HTTP/2, and HTTP/3 QUIC."""
+    return compare_http_protocols(asset_count=assets, rtt_ms=rtt_ms, loss_rate_pct=loss_rate)
+
+
+@router.get("/tier-c/icmp-diagnostics")
+def api_icmp_diagnostics(
+    target: str = "1.1.1.1",
+    count: int = 5,
+    current_user: User = Depends(get_lab_user),
+):
+    """C4: Execute RFC 792 ICMP Echo diagnostics and latency distribution statistics."""
+    return run_icmp_diagnostics(target=target, count=count)
+
+
+

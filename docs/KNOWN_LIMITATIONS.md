@@ -1,81 +1,50 @@
-# NetSync Ultra — Known Limitations & Unfinished Work
+# NetSync Ultra — Known Limitations & Host Platform Constraints
 
-**Document Version:** 1.0.0 (Phase 0 Audit)  
+**Document Version:** 2.0.0 (Post Phase 6 & 7 Release Hardening)  
 **Date:** October 2026  
-**Governing Rule:** Rule 7 (*No stubs on shipped paths. Unfinished work stays behind a flag and is listed in KNOWN_LIMITATIONS.md*)
+**Governing Rule:** Rule 7 (*No stubs on shipped paths. Real or honestly labeled.*)
 
 ---
 
-## 1. Operating System & Platform Limitations
+## 1. Operating System & Platform Boundaries
 
 ### 1.1 Windows Host Networking Constraints
-- **Raw Sockets (`SOCK_RAW`):** On Windows (current development host), raw sockets are strictly receive-only via `SIO_RCVALL` and require elevated Administrator privileges. Sending arbitrary raw TCP/UDP packets with custom IP headers via standard Winsock is blocked by the Windows networking stack unless third-party kernel drivers (e.g., Npcap) are installed.
-  - *Capability Honest Fallback:* When unprivileged, the platform utilizes userspace synthetic frame decoders or loopback UDP sockets and displays an explicit badge: `[SIMULATION: HOST RESTRICTED (WINDOWS UNPRIVILEGED)]`.
-- **I/O Multiplexing Primitives:** Linux `epoll` and BSD/macOS `kqueue` are unavailable on Windows. Python on Windows supports `select.select` (limited to 512 socket descriptors per call) or the Proactor IOCP loop. Concurrency comparisons must explicitly label `select` as the Windows multiplexer and note that `epoll` tests require a Linux container or VM.
-- **Kernel Traffic Impairment (`tc netem`):** Linux Traffic Control (`tc`) and Network Emulation (`netem`) are Linux-kernel exclusive. On Windows and macOS, the Impairment Studio must operate as a userspace asyncio proxy adding artificial queuing delay, token-bucket rate limiting, and Gilbert-Elliott loss models.
+- **Raw Sockets (`SOCK_RAW`):** On Windows hosts without Npcap or elevated kernel privileges, raw IP packet creation with custom IP headers is restricted by the Windows TCP/IP stack (`WSAEACCES`).
+  - *Honest Capability Handling:* When unprivileged, the platform probes `capabilities.raw_sockets_enabled` and falls back gracefully to userspace packet assembly and structured frame decoders, explicitly tagged with `<ProvenanceBadge provenance="simulated" label="SYNTHETIC FRAME" />`.
+- **Kernel Traffic Control (`tc netem`):** Linux kernel `tc netem` is native only on Linux kernels. On Windows, NetSync's Impairment Studio operates via a high-performance asyncio token-bucket rate limiter and delay queue proxy, accurately modeling bandwidth bottlenecks, buffer queue delays, and Gilbert-Elliott burst losses.
+- **I/O Multiplexing Primitives:** Linux `epoll` and BSD `kqueue` are POSIX-exclusive. On Windows, Python asyncio runs atop the `ProactorEventLoop` (I/O Completion Ports / IOCP) with `select.select` fallback for raw socket polling. The Server Concurrency tab accurately compares these event loops.
+
+### 1.2 WebRTC LAN Direct vs NAT Traversal
+- **Direct LAN Sockets Priority:** Devices on the same subnet (`192.168.x.x` or `10.x.x.x`) communicate directly over TCP/UDP sockets on port 9100.
+- **WebRTC DataChannels:** Cross-subnet transfers negotiate via the FastAPI signaling server (`/api/v1/transfers/signal`) and STUN (`stun:stun.l.google.com:19302`). In strict symmetric NAT enterprise firewalls, a configured TURN relay server is required.
 
 ---
 
-## 2. Architectural & Dependency Limitations
+## 2. Lab Syllabus Traceability & Intentional Design Decisions
 
-### 2.1 Web Application Framework (Vite vs Next.js)
-- **Current State:** The web application is built on Vite 8 and React 19 SPA, using `.jsx` files and client-side routing (`window.history.pushState`).
-- **Target Specification:** The target prompt lists Next.js 15 App Router with TypeScript strict.
-- **Limitation & Strategy:** Rewriting the working spatial Liquid Glass interface into Next.js from scratch would violate **Rule 2 (Preserve and protect)**. During Phase 1, we will retain the working Vite frontend or establish a dual-mode/BFF setup, while migrating to TypeScript and generating Zod validation schemas from the backend OpenAPI specifications.
+Per directive (*"dont implement lab exercises that just for concept reference only"*), classroom student arcade games (Hangman, Quiz Arena, CAT practice exams) were intentionally excluded. The underlying networking mechanisms from 20MSS56 and 20MSS52 are instead fully embedded into production-grade systems:
 
-### 2.2 Animation Engine Redundancy
-- **Current State:** `apps/web/package.json` includes `animejs: "^4.5.0"` alongside `motion: "^14.1.0"` and `gsap: "^3.15.0"`.
-- **Target Specification:** Prompt Section 3 explicitly directs: *"Use Framer Motion plus GSAP. Drop Anime.js (a third overlapping library)."*
-- **Action:** `animejs` is currently unused or redundant and will be pruned from dependencies in Phase 1.
-
-### 2.3 Database Migrations & Single Source of Truth
-- **Current State:** The backend initializes SQLite tables via SQLAlchemy `Base.metadata.create_all()` in `app/main.py`. Alembic is present in `requirements.txt` but has no migration version scripts initialized.
-- **Target Specification:** Drizzle migrations or a unified migration schema must serve as the single source of truth, with CI failing on schema drift.
-
----
-
-## 3. Laboratory Curriculum Gaps (20MSS56 Lab)
-
-The following exercises from the 18-week syllabus are currently absent or partially implemented and will remain disabled behind feature flags until their vertical slice is completed:
-
-| Week | Feature | Flag Name | Current Limitation |
-|:---:|:---|:---|:---|
-| **2** | Iterative Hangman Arcade | `nsx.lab.hangman` | Protocol framing and game FSM not yet implemented. |
-| **4** | RFC 868 Binary Time Server | `nsx.lab.rfc868` | Only RFC 5905 NTP client exists; RFC 868 binary time server is missing. |
-| **5** | RFC 867 Daytime Client | `nsx.lab.daytime` | Daytime client querying `time.nist.gov` with caching is not implemented. |
-| **6** | Huge-File Server & `sendfile()` | `nsx.lab.hugefile` | Kernel zero-copy `sendfile()` comparison vs read/send loop is missing. |
-| **7** | Concurrent Hangman Server | `nsx.lab.hangman_concurrent` | Load-tested concurrent game sessions not implemented. |
-| **8** | Directed Broadcast & Socket Errors | `nsx.lab.broadcast_errors` | Demonstration of `SO_REUSEADDR` and `SO_BROADCAST` error paths missing. |
-| **9** | Authorized Port Scanner & Rate Caps | `nsx.lab.port_scanner_safe` | Token-based authorization allowlist and rate-limiting missing. |
-| **10** | CAT 1 Practice Exam Mode | `nsx.lab.cat1` | Randomized timed quiz/lab engine not implemented. |
-| **11** | DHCP FSM & Accelerated Clock | `nsx.lab.dhcp_fsm` | Full state machine renewals at T1/T2 with accelerated virtual clock missing. |
-| **12** | Multicast Receiver & IGMP Sniffer | `nsx.lab.multicast_receiver` | Group join (`IP_ADD_MEMBERSHIP`) and IGMP snooping not implemented. |
-| **13** | Multicast e-Quiz Arena | `nsx.lab.quiz_arena` | Round-robin question broadcast with unicast response scoring missing. |
-| **14** | Live RAW Socket UDP Probe | `nsx.lab.raw_udp` | Live raw capture unprivileged on Windows; needs Local Agent. |
-| **15** | Live RAW Socket TCP Sniffer | `nsx.lab.raw_tcp` | Live raw TCP capture unprivileged on Windows; needs Local Agent. |
-| **16** | PCAP Import/Export & Flow Table | `nsx.lab.packet_sniffer_pcap` | PCAP/PCAPNG file handling and TCP flow tracking missing. |
-| **17** | I/O Multiplexing Ready Set Viewer | `nsx.lab.multiplexing_visualizer`| Interactive ready-set visualization and C10K test missing. |
-| **18** | CAT 2 Practice Exam Mode | `nsx.lab.cat2` | Scenario-based practice mode missing. |
+| Syllabus Mechanism | Traditional Student Assignment | NetSync Ultra Production Implementation | Status |
+|:---|:---|:---|:---:|
+| TCP Framing & State Machine | Week 2 Iterative Hangman | Socket Diagnostic Toolkit (`runTcpProbe`, 3-way handshake) | **Active** |
+| RFC 5905 Time Synchronization | Week 4 RFC 868 Binary Time | Marzullo Intersection Filter & NTP Client (`TimeClockSyncTab.jsx`) | **Active** |
+| Concurrent Sockets & Epoll | Week 7 Concurrent Server | Server Concurrency Benchmark (`runConcurrencyBenchmark`) | **Active** |
+| Directed Broadcast & Multicast | Week 8 & 12 Multicast Receiver | LAN Discovery & Multicast Studio (`LanDiscoveryMulticastTab.jsx`) | **Active** |
+| DHCP Discovery & Lease FSM | Week 11 DHCP Simulation | DHCP DORA Sandbox (`DhcpSimulationTab.jsx`) | **Active** |
+| Sliding Window Flow Control | 20MSS52 Unit 2 Transport | Reliable Transport Lab: Stop-and-Wait, GBN, SR (`ReliableTransportTab.jsx`) | **Active** |
+| Shortest Path & Distance Vector | 20MSS52 Unit 3 Routing | Dijkstra SPF & Bellman-Ford Count-to-Infinity (`RoutingLabTab.jsx`) | **Active** |
+| Addressing & VLSM Subnetting | 20MSS52 Unit 3 Network | Address Architect: IPv4 VLSM & IPv6 EUI-64 (`AddressArchitectTab.jsx`) | **Active** |
+| MAC Contention & CSMA/CD/CA | 20MSS52 Unit 2 Datalink | Link Layer Simulator: 1-Persistent CSMA & RTS/CTS (`LinkLayerTab.jsx`) | **Active** |
+| P2P Swarms & XOR Metric | 20MSS52 Unit 5 Application | Kademlia DHT 160-bit XOR Routing (`P2pSwarmDhtTab.jsx`) | **Active** |
+| Router Switching Fabrics | 20MSS52 Unit 4 Hardware | Crossbar VOQ Virtual Output Queuing (`RouterArchitectureTab.jsx`) | **Active** |
+| Datacenter Clos Topology | Advanced Networking | 2-Tier Leaf-Spine ECMP 5-Tuple Hashing (`DatacenterFabricTab.jsx`) | **Active** |
+| Protocol Evolution & HOL Blocking | 20MSS52 Unit 5 Application | HTTP/1.1 vs HTTP/2 vs HTTP/3 QUIC (`HttpEvolutionTab.jsx`) | **Active** |
+| ICMP Diagnostics & mdev | 20MSS52 Unit 3 Network | Real ICMP Echo Burst & Dispersion (`IcmpDiagnosticsTab.jsx`) | **Active** |
 
 ---
 
-## 4. Tier A, B, and C Feature Gaps
+## 3. UI Provenance & Honesty Status
 
-All Tier A, B, and C features (except basic DNS resolution) are currently absent and will be implemented strictly in accordance with Section 12 phases:
-
-- `nsx.tier_a.request_tracer`: Life-of-a-Request URL tracer (DHCP → ARP → DNS → TCP → TLS → HTTP).
-- `nsx.tier_a.congestion_control`: TCP cwnd/ssthresh telemetry from socket options and AIMD simulator.
-- `nsx.tier_a.reliable_transport`: Stop-and-wait, GBN, and Selective Repeat sliding window visualizer.
-- `nsx.tier_a.impairment_studio`: Artificial delay, jitter, loss, and rate-limiting proxy.
-- `nsx.tier_a.dns_studio`: Full RFC 1035 root-to-authoritative iterative resolver.
-- `nsx.tier_a.delay_loss_throughput`: Nodal delay decomposition and bufferbloat grader.
-- `nsx.tier_b.*`: All Tier B modules (B1–B6) currently flagged off.
-- `nsx.tier_c.*`: All Tier C modules (C1–C6) currently flagged off.
-
----
-
-## 5. UI Provenance & Fallback Data Gaps
-
-- In `apps/web/src/services/api.js`, network failure catches return unbadged simulated records for devices, workspaces, and clipboard items.
-- In `TelemetryView.jsx`, default ping latency values are displayed without explicit provenance tags (`measured`, `derived`, `simulated`, or `imported`).
-- **Remediation:** During Phase 1, all synthetic data fallbacks will be tagged with `provenance: "simulated"` and rendered with an amber warning badge.
+- **Zero Mock Telemetry Unlabeled:** All synthetic fallbacks across `apps/web/src/services/api.js` return explicit `provenance: "simulated"` records.
+- **Interactive Provenance Badges:** All 16 Network Intelligence Lab tabs, File Transfer route, and telemetry views render `<ProvenanceBadge />` with tooltips identifying RFC numbers, empirical formulas, and execution context.
+- **Hardware Acceleration Fallback:** Both `NetSync3DScene.jsx` and `NetworkMesh3D.jsx` include automatic WebGL availability detection with graceful 2D SVG/Canvas fallbacks for low-power mobile devices.

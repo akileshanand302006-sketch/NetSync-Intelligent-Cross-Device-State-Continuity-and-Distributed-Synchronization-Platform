@@ -1,0 +1,5673 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NetSync API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/metrics": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Root Metrics",
+        "description": "Prometheus / OpenMetrics root exposition endpoint.",
+        "operationId": "root_metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Health Check",
+        "description": "Health check endpoint for liveness probes.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Readiness Check",
+        "description": "Readiness probe checking database connectivity.",
+        "operationId": "readiness_check_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/capabilities": {
+      "get": {
+        "tags": [
+          "system",
+          "system"
+        ],
+        "summary": "Get System Capabilities",
+        "description": "Retrieve host operating system and network capability matrix.\nExposes raw socket permissions, multiplexers, and graceful degradation reasons.",
+        "operationId": "get_system_capabilities_api_v1_system_capabilities_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/flags": {
+      "get": {
+        "tags": [
+          "system",
+          "system"
+        ],
+        "summary": "Get System Feature Flags",
+        "description": "Retrieve full active feature flag dictionary (nsx.<area>.<feature>).",
+        "operationId": "get_system_feature_flags_api_v1_system_flags_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/flags/{flag_name}": {
+      "get": {
+        "tags": [
+          "system",
+          "system"
+        ],
+        "summary": "Check Feature Flag",
+        "description": "Query whether a specific feature flag is currently enabled.",
+        "operationId": "check_feature_flag_api_v1_system_flags__flag_name__get",
+        "parameters": [
+          {
+            "name": "flag_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Flag Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/metrics": {
+      "get": {
+        "tags": [
+          "system",
+          "system"
+        ],
+        "summary": "Get Prometheus Metrics",
+        "description": "Expose standard Prometheus / OpenMetrics scrape format.",
+        "operationId": "get_prometheus_metrics_api_v1_system_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register User",
+        "description": "Register a new user account.",
+        "operationId": "register_user_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegister"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login Json",
+        "description": "Log in with JSON payload and receive JWT access token.",
+        "operationId": "login_json_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/token": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login Form",
+        "description": "OAuth2 compatible token login for Swagger UI.",
+        "operationId": "login_form_api_v1_auth_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_form_api_v1_auth_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get Current User Profile",
+        "description": "Get profile of current authenticated user.",
+        "operationId": "get_current_user_profile_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/devices/": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "List Devices",
+        "description": "List all registered devices belonging to the authenticated user.",
+        "operationId": "list_devices_api_v1_devices__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeviceResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Devices Api V1 Devices  Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Register Device",
+        "description": "Register a new device for the user.",
+        "operationId": "register_device_api_v1_devices__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/devices/{device_id}": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Get Device",
+        "description": "Retrieve details of a specific device.",
+        "operationId": "get_device_api_v1_devices__device_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Update Device",
+        "description": "Update device network metadata, IP, or online status.",
+        "operationId": "update_device_api_v1_devices__device_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Revoke Device",
+        "description": "Revoke and delete a device.",
+        "operationId": "revoke_device_api_v1_devices__device_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/pair/generate": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Generate Pair Token",
+        "description": "Generate a single-use 6-digit short-lived pairing code for device handshakes.",
+        "operationId": "generate_pair_token_api_v1_devices_pair_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairTokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/devices/pair/validate": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Validate Pair Token",
+        "description": "Validate 6-digit pairing code and pair new device with shared key exchange.",
+        "operationId": "validate_pair_token_api_v1_devices_pair_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairValidateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/": {
+      "get": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "List Workspaces",
+        "description": "List all workspaces belonging to the current user.",
+        "operationId": "list_workspaces_api_v1_workspaces__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Workspaces Api V1 Workspaces  Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Create Workspace",
+        "description": "Create a new workspace.",
+        "operationId": "create_workspace_api_v1_workspaces__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}": {
+      "get": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Get Workspace",
+        "description": "Fetch details and current state of a workspace.",
+        "operationId": "get_workspace_api_v1_workspaces__workspace_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Update Workspace",
+        "description": "Update workspace state (tabs, scroll, cursor) and broadcast real-time sync event.",
+        "operationId": "update_workspace_api_v1_workspaces__workspace_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Delete Workspace",
+        "description": "Delete a workspace.",
+        "operationId": "delete_workspace_api_v1_workspaces__workspace_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/continuity/": {
+      "get": {
+        "tags": [
+          "continuity"
+        ],
+        "summary": "List Continuity Sessions",
+        "description": "List recent continuity handoff requests for the user.",
+        "operationId": "list_continuity_sessions_api_v1_continuity__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContinuitySessionResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Continuity Sessions Api V1 Continuity  Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "continuity"
+        ],
+        "summary": "Create Continuity Session",
+        "description": "Initiate a continuity handoff request from source_device to target_device.\nInstantly alerts target_device over WebSocket.",
+        "operationId": "create_continuity_session_api_v1_continuity__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContinuitySessionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContinuitySessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/continuity/{session_id}": {
+      "patch": {
+        "tags": [
+          "continuity"
+        ],
+        "summary": "Update Continuity Session",
+        "description": "Update handoff status (e.g. accepted, completed, rejected).",
+        "operationId": "update_continuity_session_api_v1_continuity__session_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContinuitySessionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContinuitySessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clipboard/": {
+      "get": {
+        "tags": [
+          "clipboard"
+        ],
+        "summary": "Get Clipboard History",
+        "description": "Get recent active clipboard snippets, automatically excluding expired items.",
+        "operationId": "get_clipboard_history_api_v1_clipboard__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClipboardResponse"
+                  },
+                  "title": "Response Get Clipboard History Api V1 Clipboard  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "clipboard"
+        ],
+        "summary": "Push Clipboard",
+        "description": "Push newly copied content to universal clipboard.\nSupports end-to-end encrypted payloads (AES-256-GCM) where server stores ciphertext only.\nApplies automatic TTL expiration for sensitive items (OTPs, passwords).",
+        "operationId": "push_clipboard_api_v1_clipboard__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClipboardCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipboardResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/network/metrics": {
+      "post": {
+        "tags": [
+          "network"
+        ],
+        "summary": "Record Metric",
+        "description": "Ingest connection telemetry recorded on a client device.",
+        "operationId": "record_metric_api_v1_network_metrics_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "network"
+        ],
+        "summary": "Get Metrics History",
+        "description": "Get time-series telemetry measurements.",
+        "operationId": "get_metrics_history_api_v1_network_metrics_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetricResponse"
+                  },
+                  "title": "Response Get Metrics History Api V1 Network Metrics Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/network/summary": {
+      "get": {
+        "tags": [
+          "network"
+        ],
+        "summary": "Get Network Summary",
+        "description": "Compute aggregate statistical summary of network health.",
+        "operationId": "get_network_summary_api_v1_network_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sync/push": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "Push State Sync",
+        "description": "Process incoming state sync payload.\n- If delta: applies delta onto current base state\n- If full: checks for concurrent divergence and resolves conflicts\n- Calculates bandwidth savings\n- Broadcasts updated state to connected peer devices",
+        "operationId": "push_state_sync_api_v1_sync_push_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncPushRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncPushResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sync/history": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "Get Sync History",
+        "description": "Retrieve history of state sync operations with byte savings and delta statistics.",
+        "operationId": "get_sync_history_api_v1_sync_history_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SyncLogResponse"
+                  },
+                  "title": "Response Get Sync History Api V1 Sync History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/": {
+      "post": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Create Transfer",
+        "description": "Initiate an authorized peer-to-peer file transfer session.\nValidates sender and receiver devices belonging to the user.\nNotifies recipient device via real-time WebSocket invitation.",
+        "operationId": "create_transfer_api_v1_transfers__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "List Transfers",
+        "description": "Retrieve transfer session history for the authenticated user.",
+        "operationId": "list_transfers_api_v1_transfers__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferResponse"
+                  },
+                  "title": "Response List Transfers Api V1 Transfers  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}": {
+      "get": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Get Transfer",
+        "description": "Get single transfer session metadata and status.",
+        "operationId": "get_transfer_api_v1_transfers__transfer_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/accept": {
+      "post": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Accept Transfer",
+        "description": "Recipient accepts the incoming transfer invitation.",
+        "operationId": "accept_transfer_api_v1_transfers__transfer_id__accept_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/reject": {
+      "post": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Reject Transfer",
+        "description": "Recipient rejects the incoming transfer invitation.",
+        "operationId": "reject_transfer_api_v1_transfers__transfer_id__reject_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TransferActionRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Action"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/cancel": {
+      "post": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Cancel Transfer",
+        "description": "Cancel an active or pending transfer.",
+        "operationId": "cancel_transfer_api_v1_transfers__transfer_id__cancel_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TransferActionRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Action"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/complete": {
+      "post": {
+        "tags": [
+          "transfers"
+        ],
+        "summary": "Complete Transfer",
+        "description": "Record verified completion of a file transfer session.\nPersists empirical throughput, duration, and SHA-256 integrity result.",
+        "operationId": "complete_transfer_api_v1_transfers__transfer_id__complete_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferCompleteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/socket/tcp": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Run Tcp Probe",
+        "description": "Execute TCP client connection and round-trip timing probe.",
+        "operationId": "run_tcp_probe_api_v1_lab_socket_tcp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TCPEchoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/socket/udp": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Run Udp Probe",
+        "description": "Execute UDP datagram probe with loss and jitter analysis.",
+        "operationId": "run_udp_probe_api_v1_lab_socket_udp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UDPEchoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/socket/time": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Query Time Service",
+        "description": "Query external RFC 5905 NTP server to compare wall-clock vs monotonic elapsed time.",
+        "operationId": "query_time_service_api_v1_lab_socket_time_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "host",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "time.cloudflare.com",
+              "title": "Host"
+            }
+          },
+          {
+            "name": "port",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 123,
+              "title": "Port"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/concurrency/benchmark": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Run Concurrency Benchmark",
+        "description": "Run benchmark comparing Iterative vs Concurrent vs Multiplexed server models.",
+        "operationId": "run_concurrency_benchmark_api_v1_lab_concurrency_benchmark_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConcurrencyBenchmarkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/packet/samples": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Get Sample Packets",
+        "description": "Get realistic laboratory packet captures with parsed layers and hex representations.",
+        "operationId": "get_sample_packets_api_v1_lab_packet_samples_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/packet/parse": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Parse Custom Packet",
+        "description": "Parse raw hex packet bytes into Ethernet, IPv4, IPv6, TCP, and UDP layers.",
+        "operationId": "parse_custom_packet_api_v1_lab_packet_parse_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParsePacketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/ports/scan": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Scan Ports",
+        "description": "Scan authorized target ports and classify into OPEN, CLOSED, or FILTERED states.",
+        "operationId": "scan_ports_api_v1_lab_ports_scan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortScanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/dns/diag": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Dns Diagnostics",
+        "description": "Execute DNS resolution and reverse PTR diagnostics.",
+        "operationId": "dns_diagnostics_api_v1_lab_dns_diag_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DNSDiagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/discovery/broadcast": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Test Broadcast",
+        "description": "Send UDP SO_BROADCAST discovery probe to 255.255.255.255.",
+        "operationId": "test_broadcast_api_v1_lab_discovery_broadcast_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "port",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 9100,
+              "title": "Port"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/discovery/multicast": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Test Multicast",
+        "description": "Transmit sequence-numbered datagrams to a Class D multicast group.",
+        "operationId": "test_multicast_api_v1_lab_discovery_multicast_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MulticastRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/dhcp/status": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Get Dhcp Sandbox Status",
+        "description": "Get active DHCP sandbox server state, IP pool allocation, and leases.",
+        "operationId": "get_dhcp_sandbox_status_api_v1_lab_dhcp_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/dhcp/dora": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Simulate Dhcp Dora",
+        "description": "Simulate complete RFC 2131 Discover-Offer-Request-Ack handshake for a client.",
+        "operationId": "simulate_dhcp_dora_api_v1_lab_dhcp_dora_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DHCPDoraRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/dhcp/release": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Release Dhcp Lease",
+        "description": "Simulate client releasing its active DHCP address lease.",
+        "operationId": "release_dhcp_lease_api_v1_lab_dhcp_release_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DHCPReleaseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/experiments": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "List Experiments",
+        "description": "List 10 structured Capstone experiments matching course 20MSS56.",
+        "operationId": "list_experiments_api_v1_lab_experiments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/experiments/run/{experiment_id}": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Execute Single Experiment",
+        "description": "Execute a single structured experiment and collect actual measurements.",
+        "operationId": "execute_single_experiment_api_v1_lab_experiments_run__experiment_id__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "experiment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Experiment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/experiments/run-all": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Execute All Experiments",
+        "description": "Execute all 10 Capstone experiments and generate a comprehensive evaluation report.",
+        "operationId": "execute_all_experiments_api_v1_lab_experiments_run_all_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/request-tracer": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Trace Request",
+        "description": "A1: Trace full life-of-a-request across DHCP, ARP, DNS, TCP, TLS, and HTTP.",
+        "operationId": "api_trace_request_api_v1_lab_tier_a_request_tracer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestTracerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/congestion-simulator": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Simulate Congestion",
+        "description": "A2: Simulate TCP Reno, Cubic, and BBR congestion control state machines.",
+        "operationId": "api_simulate_congestion_api_v1_lab_tier_a_congestion_simulator_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CongestionSimulatorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/reliable-transport": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Simulate Transport",
+        "description": "A3: Simulate Stop-and-Wait, Go-Back-N, and Selective Repeat sliding window ARQ.",
+        "operationId": "api_simulate_transport_api_v1_lab_tier_a_reliable_transport_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReliableTransportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/impairment-studio": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Calculate Impairment",
+        "description": "A4: Model throughput degradation and latency under link impairments.",
+        "operationId": "api_calculate_impairment_api_v1_lab_tier_a_impairment_studio_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpairmentStudioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/dns-studio": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Dns Hierarchy",
+        "description": "A5: RFC 1035 root-to-authoritative recursive resolution and cache audit.",
+        "operationId": "api_dns_hierarchy_api_v1_lab_tier_a_dns_studio_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DnsStudioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-a/nodal-delay": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Nodal Delay",
+        "description": "A6: Decompose nodal delay (proc, queue, trans, prop) and grade bufferbloat.",
+        "operationId": "api_nodal_delay_api_v1_lab_tier_a_nodal_delay_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NodalDelayRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/as-path": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api As Path",
+        "description": "B1: Trace AS-level autonomous system path & BGP attributes.",
+        "operationId": "api_as_path_api_v1_lab_tier_b_as_path_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "destination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "1.1.1.1",
+              "title": "Destination"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-b/dijkstra": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Dijkstra",
+        "description": "B2: Run Dijkstra's Link-State shortest path tree algorithm.",
+        "operationId": "api_dijkstra_api_v1_lab_tier_b_dijkstra_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "A",
+              "title": "Source"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-b/count-to-infinity": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Count To Infinity",
+        "description": "B2: Demonstrate Bellman-Ford count-to-infinity routing loop & poison reverse.",
+        "operationId": "api_count_to_infinity_api_v1_lab_tier_b_count_to_infinity_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/vlsm": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Vlsm",
+        "description": "B3: Calculate optimal Variable Length Subnet Masking (VLSM) allocations.",
+        "operationId": "api_vlsm_api_v1_lab_tier_b_vlsm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VlsmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/eui64": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Eui64",
+        "description": "B3: Generate RFC 4291 Modified EUI-64 IPv6 interface identifier.",
+        "operationId": "api_eui64_api_v1_lab_tier_b_eui64_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Eui64Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/csmacd": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Csmacd",
+        "description": "B4: Simulate 802.3 CSMA/CD Truncated Binary Exponential Backoff.",
+        "operationId": "api_csmacd_api_v1_lab_tier_b_csmacd_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collisions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 4,
+              "title": "Collisions"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-b/csmaca": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Csmaca",
+        "description": "B4: Simulate 802.11 RTS/CTS 4-way handshake solving hidden terminals.",
+        "operationId": "api_csmaca_api_v1_lab_tier_b_csmaca_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/kademlia-distance": {
+      "post": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Kademlia",
+        "description": "B5: Compute Kademlia XOR metric distance and k-bucket index.",
+        "operationId": "api_kademlia_api_v1_lab_tier_b_kademlia_distance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KademliaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-b/marzullo-ntp": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Marzullo",
+        "description": "B6: Execute RFC 5905 NTP Marzullo clock intersection algorithm.",
+        "operationId": "api_marzullo_api_v1_lab_tier_b_marzullo_ntp_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lab/tier-c/router-architecture": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Router Architecture",
+        "description": "C1: Simulate router switching fabrics and Head-of-Line (HOL) blocking.",
+        "operationId": "api_router_architecture_api_v1_lab_tier_c_router_architecture_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "fabric_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "crossbar",
+              "title": "Fabric Type"
+            }
+          },
+          {
+            "name": "input_ports",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 4,
+              "title": "Input Ports"
+            }
+          },
+          {
+            "name": "enable_voq",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Enable Voq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-c/datacenter-fabric": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Datacenter Fabric",
+        "description": "C2: Evaluate 2-tier Clos Leaf-Spine datacenter fabric & ECMP hashing.",
+        "operationId": "api_datacenter_fabric_api_v1_lab_tier_c_datacenter_fabric_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "spines",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 4,
+              "title": "Spines"
+            }
+          },
+          {
+            "name": "leafs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 8,
+              "title": "Leafs"
+            }
+          },
+          {
+            "name": "servers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 32,
+              "title": "Servers"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-c/http-evolution": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Http Evolution",
+        "description": "C3: Compare page load performance across HTTP/1.1, HTTP/2, and HTTP/3 QUIC.",
+        "operationId": "api_http_evolution_api_v1_lab_tier_c_http_evolution_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assets",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Assets"
+            }
+          },
+          {
+            "name": "rtt_ms",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 40.0,
+              "title": "Rtt Ms"
+            }
+          },
+          {
+            "name": "loss_rate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 2.0,
+              "title": "Loss Rate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lab/tier-c/icmp-diagnostics": {
+      "get": {
+        "tags": [
+          "network-lab"
+        ],
+        "summary": "Api Icmp Diagnostics",
+        "description": "C4: Execute RFC 792 ICMP Echo diagnostics and latency distribution statistics.",
+        "operationId": "api_icmp_diagnostics_api_v1_lab_tier_c_icmp_diagnostics_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "1.1.1.1",
+              "title": "Target"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "title": "Count"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_login_form_api_v1_auth_token_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^password$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "default": ""
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_form_api_v1_auth_token_post"
+      },
+      "ClipboardCreate": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type",
+            "default": "text/plain"
+          },
+          "is_encrypted": {
+            "type": "boolean",
+            "title": "Is Encrypted",
+            "default": false
+          },
+          "iv_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iv Base64"
+          },
+          "key_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Id"
+          },
+          "is_sensitive": {
+            "type": "boolean",
+            "title": "Is Sensitive",
+            "default": false
+          },
+          "ttl_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttl Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id",
+          "content"
+        ],
+        "title": "ClipboardCreate"
+      },
+      "ClipboardResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "byte_size": {
+            "type": "integer",
+            "title": "Byte Size"
+          },
+          "is_encrypted": {
+            "type": "boolean",
+            "title": "Is Encrypted",
+            "default": false
+          },
+          "iv_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iv Base64"
+          },
+          "key_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Id"
+          },
+          "is_sensitive": {
+            "type": "boolean",
+            "title": "Is Sensitive",
+            "default": false
+          },
+          "ttl_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttl Seconds"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "device_id",
+          "content",
+          "content_type",
+          "byte_size",
+          "created_at"
+        ],
+        "title": "ClipboardResponse"
+      },
+      "ConcurrencyBenchmarkRequest": {
+        "properties": {
+          "architecture": {
+            "type": "string",
+            "pattern": "^(iterative|concurrent|multiplexed)$",
+            "title": "Architecture",
+            "default": "multiplexed"
+          },
+          "clients_count": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Clients Count",
+            "default": 10
+          },
+          "requests_per_client": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Requests Per Client",
+            "default": 5
+          },
+          "payload_bytes": {
+            "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 16.0,
+            "title": "Payload Bytes",
+            "default": 128
+          }
+        },
+        "type": "object",
+        "title": "ConcurrencyBenchmarkRequest"
+      },
+      "CongestionSimulatorRequest": {
+        "properties": {
+          "algorithm": {
+            "type": "string",
+            "pattern": "^(reno|cubic|bbr)$",
+            "title": "Algorithm",
+            "default": "reno"
+          },
+          "rtt_ms": {
+            "type": "number",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Rtt Ms",
+            "default": 30.0
+          },
+          "bandwidth_mbps": {
+            "type": "number",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Bandwidth Mbps",
+            "default": 100.0
+          },
+          "loss_rate": {
+            "type": "number",
+            "maximum": 0.5,
+            "minimum": 0.0,
+            "title": "Loss Rate",
+            "default": 0.02
+          },
+          "buffer_packets": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 5.0,
+            "title": "Buffer Packets",
+            "default": 60
+          },
+          "total_rounds": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 10.0,
+            "title": "Total Rounds",
+            "default": 60
+          }
+        },
+        "type": "object",
+        "title": "CongestionSimulatorRequest"
+      },
+      "ContinuitySessionCreate": {
+        "properties": {
+          "source_device_id": {
+            "type": "string",
+            "title": "Source Device Id"
+          },
+          "target_device_id": {
+            "type": "string",
+            "title": "Target Device Id"
+          },
+          "session_type": {
+            "type": "string",
+            "title": "Session Type",
+            "default": "handoff"
+          },
+          "state_type": {
+            "type": "string",
+            "title": "State Type",
+            "default": "workspace"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source_device_id",
+          "target_device_id",
+          "payload"
+        ],
+        "title": "ContinuitySessionCreate"
+      },
+      "ContinuitySessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "source_device_id": {
+            "type": "string",
+            "title": "Source Device Id"
+          },
+          "target_device_id": {
+            "type": "string",
+            "title": "Target Device Id"
+          },
+          "session_type": {
+            "type": "string",
+            "title": "Session Type"
+          },
+          "state_type": {
+            "type": "string",
+            "title": "State Type"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "source_device_id",
+          "target_device_id",
+          "session_type",
+          "state_type",
+          "payload",
+          "status",
+          "created_at"
+        ],
+        "title": "ContinuitySessionResponse"
+      },
+      "ContinuitySessionUpdate": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "ContinuitySessionUpdate"
+      },
+      "DHCPDoraRequest": {
+        "properties": {
+          "client_mac": {
+            "type": "string",
+            "title": "Client Mac",
+            "default": "00:1A:2B:3C:4D:5E"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name",
+            "default": "Laptop Alpha"
+          },
+          "force_ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Force Ip"
+          }
+        },
+        "type": "object",
+        "title": "DHCPDoraRequest"
+      },
+      "DHCPReleaseRequest": {
+        "properties": {
+          "client_mac": {
+            "type": "string",
+            "title": "Client Mac"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_mac"
+        ],
+        "title": "DHCPReleaseRequest"
+      },
+      "DNSDiagRequest": {
+        "properties": {
+          "hostname": {
+            "type": "string",
+            "title": "Hostname",
+            "default": "localhost"
+          }
+        },
+        "type": "object",
+        "title": "DNSDiagRequest"
+      },
+      "DeviceCreate": {
+        "properties": {
+          "device_name": {
+            "type": "string",
+            "title": "Device Name"
+          },
+          "device_type": {
+            "type": "string",
+            "title": "Device Type",
+            "default": "desktop"
+          },
+          "os": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os"
+          },
+          "browser": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Browser"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 9100
+          },
+          "metadata_json": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata Json"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_name"
+        ],
+        "title": "DeviceCreate"
+      },
+      "DeviceResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "device_name": {
+            "type": "string",
+            "title": "Device Name"
+          },
+          "device_type": {
+            "type": "string",
+            "title": "Device Type"
+          },
+          "os": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os"
+          },
+          "browser": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Browser"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port"
+          },
+          "is_online": {
+            "type": "boolean",
+            "title": "Is Online"
+          },
+          "is_trusted": {
+            "type": "boolean",
+            "title": "Is Trusted"
+          },
+          "last_seen": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "metadata_json": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata Json"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "device_name",
+          "device_type",
+          "port",
+          "is_online",
+          "is_trusted",
+          "last_seen",
+          "created_at"
+        ],
+        "title": "DeviceResponse"
+      },
+      "DeviceUpdate": {
+        "properties": {
+          "device_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Name"
+          },
+          "is_online": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Online"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "port": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Port"
+          },
+          "metadata_json": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata Json"
+          }
+        },
+        "type": "object",
+        "title": "DeviceUpdate"
+      },
+      "DnsStudioRequest": {
+        "properties": {
+          "domain": {
+            "type": "string",
+            "title": "Domain",
+            "default": "netsync.dev"
+          }
+        },
+        "type": "object",
+        "title": "DnsStudioRequest"
+      },
+      "Eui64Request": {
+        "properties": {
+          "mac_address": {
+            "type": "string",
+            "title": "Mac Address",
+            "default": "3A:8F:C2:59:E0:11"
+          },
+          "prefix": {
+            "type": "string",
+            "title": "Prefix",
+            "default": "2001:db8:acad::"
+          }
+        },
+        "type": "object",
+        "title": "Eui64Request"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ImpairmentStudioRequest": {
+        "properties": {
+          "base_rtt_ms": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.1,
+            "title": "Base Rtt Ms",
+            "default": 4.0
+          },
+          "added_delay_ms": {
+            "type": "number",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Added Delay Ms",
+            "default": 60.0
+          },
+          "jitter_ms": {
+            "type": "number",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Jitter Ms",
+            "default": 12.0
+          },
+          "loss_percent": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Loss Percent",
+            "default": 5.0
+          },
+          "bandwidth_cap_mbps": {
+            "type": "number",
+            "maximum": 1000.0,
+            "minimum": 0.1,
+            "title": "Bandwidth Cap Mbps",
+            "default": 20.0
+          },
+          "file_size_mb": {
+            "type": "number",
+            "maximum": 5000.0,
+            "minimum": 0.1,
+            "title": "File Size Mb",
+            "default": 100.0
+          }
+        },
+        "type": "object",
+        "title": "ImpairmentStudioRequest"
+      },
+      "KademliaRequest": {
+        "properties": {
+          "node_a_hex": {
+            "type": "string",
+            "title": "Node A Hex",
+            "default": "A1B2C3"
+          },
+          "node_b_hex": {
+            "type": "string",
+            "title": "Node B Hex",
+            "default": "A1B2D5"
+          }
+        },
+        "type": "object",
+        "title": "KademliaRequest"
+      },
+      "MetricCreate": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "peer_device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peer Device Id"
+          },
+          "path_type": {
+            "type": "string",
+            "title": "Path Type",
+            "default": "lan"
+          },
+          "latency_ms": {
+            "type": "number",
+            "title": "Latency Ms"
+          },
+          "throughput_bps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throughput Bps",
+            "default": 0.0
+          },
+          "jitter_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jitter Ms",
+            "default": 0.0
+          },
+          "packet_loss_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Packet Loss Rate",
+            "default": 0.0
+          },
+          "samples_count": {
+            "type": "integer",
+            "title": "Samples Count",
+            "default": 1
+          },
+          "raw_samples": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Raw Samples",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id",
+          "latency_ms"
+        ],
+        "title": "MetricCreate"
+      },
+      "MetricResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "peer_device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peer Device Id"
+          },
+          "path_type": {
+            "type": "string",
+            "title": "Path Type"
+          },
+          "latency_ms": {
+            "type": "number",
+            "title": "Latency Ms"
+          },
+          "throughput_bps": {
+            "type": "number",
+            "title": "Throughput Bps"
+          },
+          "jitter_ms": {
+            "type": "number",
+            "title": "Jitter Ms"
+          },
+          "packet_loss_rate": {
+            "type": "number",
+            "title": "Packet Loss Rate"
+          },
+          "samples_count": {
+            "type": "integer",
+            "title": "Samples Count"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "device_id",
+          "path_type",
+          "latency_ms",
+          "throughput_bps",
+          "jitter_ms",
+          "packet_loss_rate",
+          "samples_count",
+          "timestamp"
+        ],
+        "title": "MetricResponse"
+      },
+      "MulticastRequest": {
+        "properties": {
+          "group": {
+            "type": "string",
+            "title": "Group",
+            "default": "239.255.0.1"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 9105
+          },
+          "ttl": {
+            "type": "integer",
+            "maximum": 32.0,
+            "minimum": 1.0,
+            "title": "Ttl",
+            "default": 1
+          },
+          "message_count": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Message Count",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "title": "MulticastRequest"
+      },
+      "NetworkSummaryResponse": {
+        "properties": {
+          "avg_latency_ms": {
+            "type": "number",
+            "title": "Avg Latency Ms"
+          },
+          "min_latency_ms": {
+            "type": "number",
+            "title": "Min Latency Ms"
+          },
+          "max_latency_ms": {
+            "type": "number",
+            "title": "Max Latency Ms"
+          },
+          "avg_throughput_mbps": {
+            "type": "number",
+            "title": "Avg Throughput Mbps"
+          },
+          "avg_jitter_ms": {
+            "type": "number",
+            "title": "Avg Jitter Ms"
+          },
+          "packet_loss_rate": {
+            "type": "number",
+            "title": "Packet Loss Rate"
+          },
+          "total_measurements": {
+            "type": "integer",
+            "title": "Total Measurements"
+          },
+          "direct_lan_percentage": {
+            "type": "number",
+            "title": "Direct Lan Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "avg_latency_ms",
+          "min_latency_ms",
+          "max_latency_ms",
+          "avg_throughput_mbps",
+          "avg_jitter_ms",
+          "packet_loss_rate",
+          "total_measurements",
+          "direct_lan_percentage"
+        ],
+        "title": "NetworkSummaryResponse"
+      },
+      "NodalDelayRequest": {
+        "properties": {
+          "packet_size_bytes": {
+            "type": "integer",
+            "maximum": 9000.0,
+            "minimum": 64.0,
+            "title": "Packet Size Bytes",
+            "default": 1500
+          },
+          "link_rate_mbps": {
+            "type": "number",
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Link Rate Mbps",
+            "default": 100.0
+          },
+          "distance_km": {
+            "type": "number",
+            "maximum": 40000.0,
+            "minimum": 0.1,
+            "title": "Distance Km",
+            "default": 500.0
+          },
+          "propagation_speed_km_s": {
+            "type": "number",
+            "maximum": 300000.0,
+            "minimum": 10000.0,
+            "title": "Propagation Speed Km S",
+            "default": 200000.0
+          },
+          "processing_delay_us": {
+            "type": "number",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Processing Delay Us",
+            "default": 10.0
+          },
+          "current_queue_packets": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Current Queue Packets",
+            "default": 25
+          },
+          "unloaded_ping_ms": {
+            "type": "number",
+            "maximum": 500.0,
+            "minimum": 0.1,
+            "title": "Unloaded Ping Ms",
+            "default": 12.0
+          },
+          "loaded_ping_ms": {
+            "type": "number",
+            "maximum": 2000.0,
+            "minimum": 0.1,
+            "title": "Loaded Ping Ms",
+            "default": 85.0
+          }
+        },
+        "type": "object",
+        "title": "NodalDelayRequest"
+      },
+      "PairTokenRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "PairTokenRequest"
+      },
+      "PairTokenResponse": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "title": "Expires In Seconds",
+            "default": 300
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "PairTokenResponse"
+      },
+      "PairValidateRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "device_name": {
+            "type": "string",
+            "title": "Device Name"
+          },
+          "device_type": {
+            "type": "string",
+            "title": "Device Type"
+          },
+          "os": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os"
+          },
+          "browser": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Browser"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 9100
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "device_name",
+          "device_type"
+        ],
+        "title": "PairValidateRequest"
+      },
+      "PairValidateResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "device": {
+            "$ref": "#/components/schemas/DeviceResponse"
+          },
+          "shared_secret": {
+            "type": "string",
+            "title": "Shared Secret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "device",
+          "shared_secret"
+        ],
+        "title": "PairValidateResponse"
+      },
+      "ParsePacketRequest": {
+        "properties": {
+          "hex_payload": {
+            "type": "string",
+            "title": "Hex Payload",
+            "description": "Hex string representing raw packet bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hex_payload"
+        ],
+        "title": "ParsePacketRequest"
+      },
+      "PortScanRequest": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host",
+            "default": "127.0.0.1"
+          },
+          "ports": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ports"
+          },
+          "timeout_sec": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.1,
+            "title": "Timeout Sec",
+            "default": 0.4
+          }
+        },
+        "type": "object",
+        "title": "PortScanRequest"
+      },
+      "ReliableTransportRequest": {
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "pattern": "^(stop_and_wait|go_back_n|selective_repeat)$",
+            "title": "Protocol",
+            "default": "go_back_n"
+          },
+          "window_size": {
+            "type": "integer",
+            "maximum": 16.0,
+            "minimum": 1.0,
+            "title": "Window Size",
+            "default": 4
+          },
+          "total_packets": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Total Packets",
+            "default": 12
+          },
+          "drop_packets": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drop Packets"
+          },
+          "corrupt_packets": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrupt Packets"
+          }
+        },
+        "type": "object",
+        "title": "ReliableTransportRequest"
+      },
+      "RequestTracerRequest": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "default": "https://netsync.dev/api/v1/health"
+          },
+          "client_ip": {
+            "type": "string",
+            "title": "Client Ip",
+            "default": "192.168.1.105"
+          },
+          "gateway_ip": {
+            "type": "string",
+            "title": "Gateway Ip",
+            "default": "192.168.1.1"
+          }
+        },
+        "type": "object",
+        "title": "RequestTracerRequest"
+      },
+      "SyncLogResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "state_id": {
+            "type": "string",
+            "title": "State Id"
+          },
+          "state_type": {
+            "type": "string",
+            "title": "State Type"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "sync_type": {
+            "type": "string",
+            "title": "Sync Type"
+          },
+          "delta_used": {
+            "type": "boolean",
+            "title": "Delta Used"
+          },
+          "bytes_transferred": {
+            "type": "integer",
+            "title": "Bytes Transferred"
+          },
+          "bytes_saved": {
+            "type": "integer",
+            "title": "Bytes Saved"
+          },
+          "duration_ms": {
+            "type": "number",
+            "title": "Duration Ms"
+          },
+          "conflict_detected": {
+            "type": "boolean",
+            "title": "Conflict Detected"
+          },
+          "conflict_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conflict Strategy"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "device_id",
+          "state_id",
+          "state_type",
+          "version",
+          "sync_type",
+          "delta_used",
+          "bytes_transferred",
+          "bytes_saved",
+          "duration_ms",
+          "conflict_detected",
+          "timestamp"
+        ],
+        "title": "SyncLogResponse"
+      },
+      "SyncPushRequest": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "state_id": {
+            "type": "string",
+            "title": "State Id"
+          },
+          "state_type": {
+            "type": "string",
+            "title": "State Type",
+            "default": "workspace"
+          },
+          "base_version": {
+            "type": "integer",
+            "title": "Base Version",
+            "default": 0
+          },
+          "target_version": {
+            "type": "integer",
+            "title": "Target Version",
+            "default": 1
+          },
+          "state_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "State Data"
+          },
+          "is_delta": {
+            "type": "boolean",
+            "title": "Is Delta",
+            "default": false
+          },
+          "delta_payload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id",
+          "state_id",
+          "state_data"
+        ],
+        "title": "SyncPushRequest"
+      },
+      "SyncPushResponse": {
+        "properties": {
+          "state_id": {
+            "type": "string",
+            "title": "State Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "state_hash": {
+            "type": "string",
+            "title": "State Hash"
+          },
+          "delta_applied": {
+            "type": "boolean",
+            "title": "Delta Applied"
+          },
+          "conflict_detected": {
+            "type": "boolean",
+            "title": "Conflict Detected"
+          },
+          "conflict_resolved": {
+            "type": "boolean",
+            "title": "Conflict Resolved"
+          },
+          "bytes_transferred": {
+            "type": "integer",
+            "title": "Bytes Transferred"
+          },
+          "bytes_saved": {
+            "type": "integer",
+            "title": "Bytes Saved"
+          },
+          "state_data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "State Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state_id",
+          "version",
+          "state_hash",
+          "delta_applied",
+          "conflict_detected",
+          "conflict_resolved",
+          "bytes_transferred",
+          "bytes_saved",
+          "state_data"
+        ],
+        "title": "SyncPushResponse"
+      },
+      "TCPEchoRequest": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host",
+            "default": "127.0.0.1"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 9100
+          },
+          "payload_size": {
+            "type": "integer",
+            "maximum": 65536.0,
+            "minimum": 16.0,
+            "title": "Payload Size",
+            "default": 64
+          },
+          "count": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "default": 5
+          },
+          "timeout_sec": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.1,
+            "title": "Timeout Sec",
+            "default": 2.0
+          }
+        },
+        "type": "object",
+        "title": "TCPEchoRequest"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "Token"
+      },
+      "TransferActionRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "title": "TransferActionRequest"
+      },
+      "TransferCompleteRequest": {
+        "properties": {
+          "bytes_transferred": {
+            "type": "integer",
+            "title": "Bytes Transferred"
+          },
+          "throughput_mbps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throughput Mbps"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "sha256_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256 Hash"
+          },
+          "connection_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connection Method",
+            "default": "direct_p2p_webrtc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bytes_transferred"
+        ],
+        "title": "TransferCompleteRequest"
+      },
+      "TransferCreate": {
+        "properties": {
+          "sender_device_id": {
+            "type": "string",
+            "title": "Sender Device Id"
+          },
+          "receiver_device_id": {
+            "type": "string",
+            "title": "Receiver Device Id"
+          },
+          "file_name": {
+            "type": "string",
+            "title": "File Name"
+          },
+          "file_size": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "File Size",
+            "description": "File size in bytes"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type",
+            "default": "application/octet-stream"
+          },
+          "chunk_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Size",
+            "default": 65536
+          },
+          "total_chunks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Chunks",
+            "default": 1
+          },
+          "sha256_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256 Hash"
+          },
+          "connection_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connection Method",
+            "default": "direct_p2p_webrtc"
+          },
+          "metadata_json": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata Json"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sender_device_id",
+          "receiver_device_id",
+          "file_name",
+          "file_size"
+        ],
+        "title": "TransferCreate"
+      },
+      "TransferResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "sender_device_id": {
+            "type": "string",
+            "title": "Sender Device Id"
+          },
+          "receiver_device_id": {
+            "type": "string",
+            "title": "Receiver Device Id"
+          },
+          "file_name": {
+            "type": "string",
+            "title": "File Name"
+          },
+          "file_size": {
+            "type": "integer",
+            "title": "File Size"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "chunk_size": {
+            "type": "integer",
+            "title": "Chunk Size"
+          },
+          "total_chunks": {
+            "type": "integer",
+            "title": "Total Chunks"
+          },
+          "sha256_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256 Hash"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "connection_method": {
+            "type": "string",
+            "title": "Connection Method"
+          },
+          "bytes_transferred": {
+            "type": "integer",
+            "title": "Bytes Transferred"
+          },
+          "throughput_mbps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throughput Mbps"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "sender_device_id",
+          "receiver_device_id",
+          "file_name",
+          "file_size",
+          "chunk_size",
+          "total_chunks",
+          "status",
+          "connection_method",
+          "bytes_transferred",
+          "created_at"
+        ],
+        "title": "TransferResponse"
+      },
+      "UDPEchoRequest": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host",
+            "default": "127.0.0.1"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port",
+            "default": 9100
+          },
+          "payload_size": {
+            "type": "integer",
+            "maximum": 1400.0,
+            "minimum": 16.0,
+            "title": "Payload Size",
+            "default": 64
+          },
+          "count": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "default": 10
+          },
+          "interval_sec": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Interval Sec",
+            "default": 0.02
+          },
+          "timeout_sec": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.1,
+            "title": "Timeout Sec",
+            "default": 1.0
+          }
+        },
+        "type": "object",
+        "title": "UDPEchoRequest"
+      },
+      "UserLogin": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserLogin"
+      },
+      "UserRegister": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserRegister"
+      },
+      "UserResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "is_active",
+          "created_at"
+        ],
+        "title": "UserResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VlsmRequest": {
+        "properties": {
+          "network_cidr": {
+            "type": "string",
+            "title": "Network Cidr",
+            "default": "192.168.0.0/24"
+          },
+          "subnet_sizes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subnet Sizes"
+          }
+        },
+        "type": "object",
+        "title": "VlsmRequest"
+      },
+      "WorkspaceCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "active_tab_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Tab Id"
+          },
+          "tabs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Tabs",
+            "default": []
+          },
+          "cursor_positions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Cursor Positions",
+            "default": {}
+          },
+          "scroll_positions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scroll Positions",
+            "default": {}
+          },
+          "editor_buffers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Editor Buffers",
+            "default": {}
+          },
+          "layout": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Layout",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "WorkspaceCreate"
+      },
+      "WorkspaceResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "state_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Hash"
+          },
+          "active_tab_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Tab Id"
+          },
+          "tabs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Tabs"
+          },
+          "cursor_positions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Cursor Positions"
+          },
+          "scroll_positions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scroll Positions"
+          },
+          "editor_buffers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Editor Buffers"
+          },
+          "layout": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Layout"
+          },
+          "last_modified_by_device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Modified By Device"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "name",
+          "version",
+          "tabs",
+          "cursor_positions",
+          "scroll_positions",
+          "editor_buffers",
+          "layout",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "WorkspaceResponse"
+      },
+      "WorkspaceUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "active_tab_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Tab Id"
+          },
+          "tabs": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tabs"
+          },
+          "cursor_positions": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor Positions"
+          },
+          "scroll_positions": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scroll Positions"
+          },
+          "editor_buffers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Editor Buffers"
+          },
+          "layout": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout"
+          },
+          "device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "title": "WorkspaceUpdate"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/api/v1/auth/token"
+          }
+        }
+      }
+    }
+  }
+}
