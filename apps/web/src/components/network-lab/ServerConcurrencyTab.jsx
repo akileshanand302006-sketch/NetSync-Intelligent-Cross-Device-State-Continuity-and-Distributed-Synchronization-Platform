@@ -5,12 +5,8 @@ import {
   Layers,
   Activity,
   Zap,
-  TrendingUp,
   AlertTriangle,
   Play,
-  CheckCircle2,
-  Sliders,
-  BarChart2,
 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';

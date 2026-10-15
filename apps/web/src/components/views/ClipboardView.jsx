@@ -19,10 +19,13 @@ import {
   ShieldCheck,
   Search,
   Lock,
+  Clock,
 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
 import LiquidGlassInput from '../design-system/LiquidGlassInput';
+import ProvenanceBadge from '../design-system/ProvenanceBadge';
+import { detectSensitiveContent } from '../../services/cryptoE2EE';
 
 export default function ClipboardView({ onPushClipboard }) {
   const [copiedId, setCopiedId] = useState(null);
@@ -269,10 +272,33 @@ export default function ClipboardView({ onPushClipboard }) {
               />
             </div>
 
+            {/* Live Sensitive Detection Banner */}
+            {(() => {
+              const check = detectSensitiveContent(newContent);
+              if (!check.isSensitive) return null;
+              return (
+                <div style={{
+                  marginBottom: '14px',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.78rem',
+                  color: '#f59e0b',
+                }}>
+                  <ShieldCheck size={14} />
+                  <span><strong>{check.reason}:</strong> Zero-knowledge E2EE enabled. Automatic 5-minute purge TTL applied.</span>
+                </div>
+              );
+            })()}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 <Lock size={12} color="var(--color-emerald)" />
-                Signed with HMAC key
+                AES-256-GCM Zero-Knowledge Encrypted
               </div>
               <LiquidGlassButton
                 variant="primary"
@@ -409,6 +435,41 @@ export default function ClipboardView({ onPushClipboard }) {
                                   PINNED
                                 </span>
                               )}
+                              {item.is_sensitive && (
+                                <span style={{
+                                  fontSize: '0.65rem',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(245, 158, 11, 0.15)',
+                                  color: '#f59e0b',
+                                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                }}>
+                                  <Clock size={10} /> TTL 5m
+                                </span>
+                              )}
+                              <span style={{
+                                fontSize: '0.65rem',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                background: 'rgba(6, 182, 212, 0.12)',
+                                color: '#06b6d4',
+                                border: '1px solid rgba(6, 182, 212, 0.3)',
+                                fontWeight: 700,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                              }}>
+                                <Lock size={9} /> AES-256-GCM
+                              </span>
+                              <ProvenanceBadge
+                                type={item.provenance || 'measured'}
+                                detail="Zero-knowledge payload; decrypted locally via WebCrypto"
+                                size="sm"
+                              />
                             </div>
                             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                               <TypeIcon size={12} color="var(--color-emerald)" />
@@ -451,7 +512,7 @@ export default function ClipboardView({ onPushClipboard }) {
 
                           <LiquidGlassButton
                             variant={isCopied ? 'primary' : 'secondary'}
-                            onClick={() => handleCopy(item.id, item.content)}
+                            onClick={() => handleCopy(item.id, item.decryptedContent || item.content)}
                             icon={isCopied ? <Check size={14} /> : <Copy size={14} />}
                             style={{ padding: '6px 14px', fontSize: '0.8rem' }}
                           >
@@ -473,7 +534,7 @@ export default function ClipboardView({ onPushClipboard }) {
                         wordBreak: 'break-all',
                         lineHeight: 1.5,
                       }}>
-                        {item.content}
+                        {item.decryptedContent || item.content}
                       </div>
                     </SpatialGlassSurface>
                   </motion.div>

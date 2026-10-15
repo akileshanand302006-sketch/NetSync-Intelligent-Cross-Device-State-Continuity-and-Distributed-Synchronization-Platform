@@ -4,12 +4,14 @@ import { X, QrCode, Key, ShieldCheck, CheckCircle2, ArrowRight, RefreshCw } from
 import SpatialGlassSurface from './design-system/SpatialGlassSurface';
 import LiquidGlassButton from './design-system/LiquidGlassButton';
 import LiquidGlassInput from './design-system/LiquidGlassInput';
+import ProvenanceBadge from './design-system/ProvenanceBadge';
 
 export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
   const [mode, setMode] = useState('generate'); // generate | enter
   const [token, setToken] = useState('849201');
   const [timeLeft, setTimeLeft] = useState(300);
   const [inputCode, setInputCode] = useState('');
+  const [trustLevel, setTrustLevel] = useState('TRUSTED_HARDWARE'); // TRUSTED_HARDWARE | PROVISIONAL_GUEST
   const [pairingSuccess, setPairingSuccess] = useState(false);
 
   useEffect(() => {
@@ -38,6 +40,8 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
             name: 'New Hardware Peer',
             type: 'Mobile Client',
             code: inputCode,
+            trustLevel: trustLevel,
+            isTrusted: trustLevel === 'TRUSTED_HARDWARE',
           });
         }
         onClose();
@@ -176,8 +180,9 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
                 }}>
                   {token}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-                  Expires in: <span style={{ color: '#fbbf24', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{minutes}:{seconds}</span>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span>Expires in: <strong style={{ color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>{minutes}:{seconds}</strong></span>
+                  <ProvenanceBadge type="measured" detail="Cryptographically generated via secrets.randbelow" size="sm" />
                 </div>
               </div>
 
@@ -221,6 +226,38 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
                     boxSizing: 'border-box',
                   }}
                 />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Peer Hardware Trust Level:
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[
+                    { id: 'TRUSTED_HARDWARE', label: 'Trusted Hardware' },
+                    { id: 'PROVISIONAL_GUEST', label: 'Provisional Guest' },
+                  ].map(({ id, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setTrustLevel(id)}
+                      style={{
+                        flex: 1,
+                        padding: '8px 6px',
+                        borderRadius: '8px',
+                        border: '1px solid',
+                        borderColor: trustLevel === id ? 'var(--color-emerald)' : 'var(--glass-border)',
+                        background: trustLevel === id ? 'rgba(69, 245, 154, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                        color: trustLevel === id ? 'var(--color-emerald)' : 'var(--text-secondary)',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {pairingSuccess ? (

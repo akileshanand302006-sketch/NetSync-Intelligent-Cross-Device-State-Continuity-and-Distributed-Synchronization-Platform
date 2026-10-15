@@ -4,6 +4,7 @@ import { Zap, Laptop, ArrowRight, ShieldCheck, Activity, CheckCircle, Radio, Clo
 import NetSync3DScene from '../3d/NetSync3DScene';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
+import ProvenanceBadge from '../design-system/ProvenanceBadge';
 
 export default function OverviewView({
   onNavigate,
@@ -113,7 +114,10 @@ export default function OverviewView({
         <SpatialGlassSurface style={{ padding: '22px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Registered Devices</span>
-            <Laptop size={18} color="var(--color-emerald)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ProvenanceBadge type="measured" detail="Hardware devices registered in cryptographic mesh." />
+              <Laptop size={18} color="var(--color-emerald)" />
+            </div>
           </div>
           <div style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
             {devices.length || 5} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Peers</span>
@@ -126,7 +130,10 @@ export default function OverviewView({
         <SpatialGlassSurface style={{ padding: '22px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Online & Ready</span>
-            <Radio size={18} color="var(--color-emerald)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ProvenanceBadge type="measured" detail="Online presence verified via WebSocket/heartbeat." />
+              <Radio size={18} color="var(--color-emerald)" />
+            </div>
           </div>
           <div style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
             {devices.filter(d => d.is_online).length || 5} <span style={{ fontSize: '0.85rem', color: 'var(--color-emerald)' }}>Active</span>
@@ -139,7 +146,10 @@ export default function OverviewView({
         <SpatialGlassSurface style={{ padding: '22px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Pending Sync</span>
-            <Shield size={18} color="var(--color-mint)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ProvenanceBadge type="measured" detail="Offline IndexedDB outbox queue depth." />
+              <Shield size={18} color="var(--color-mint)" />
+            </div>
           </div>
           <div style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
             0 <span style={{ fontSize: '0.85rem', color: 'var(--color-emerald)' }}>Queued</span>
@@ -152,7 +162,10 @@ export default function OverviewView({
         <SpatialGlassSurface style={{ padding: '22px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Wire Bandwidth Saved</span>
-            <Activity size={18} color="var(--color-emerald)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ProvenanceBadge type="derived" detail="Calculated: (Full State - Delta Diff) / Full State." />
+              <Activity size={18} color="var(--color-emerald)" />
+            </div>
           </div>
           <div style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--color-emerald)' }}>
             87.5%

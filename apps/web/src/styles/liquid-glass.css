@@ -614,6 +614,12 @@ body {
   }
 }
 
+@media (max-width: 640px) {
+  .main-content-container {
+    padding: 0 12px 96px !important;
+  }
+}
+
 /* Footer Responsive Reflow */
 @media (max-width: 1024px) {
   .footer-grid-layout {
@@ -628,3 +634,51 @@ body {
     gap: 28px !important;
   }
 }
+
+/* Accessibility: High-Visibility Focus Rings for Keyboard Navigation */
+:focus-visible {
+  outline: 2px solid var(--color-emerald);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-emerald) !important;
+  outline-offset: 2px !important;
+}
+
+/* Reduced Motion Preference for Low-Power or Motion-Sensitive Environments */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .cinematic-bg-image {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Responsive Touch Target Enforcement (WCAG 2.5.5 / 2.5.8) */
+@media (pointer: coarse) {
+  button,
+  a[role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+  }
+}
+
+/* Smooth Touch Scrolling on Mobile */
+.scroll-touch-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+

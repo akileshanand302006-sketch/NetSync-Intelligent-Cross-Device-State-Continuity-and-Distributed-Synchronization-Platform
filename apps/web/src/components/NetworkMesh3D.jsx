@@ -1,13 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
+const DEFAULT_NODES = [
+  { id: 'dev-1', name: 'Workstation Alpha', type: 'Desktop (Host)', pos: [0, 0, 0], color: 0x38bdf8, rtt: '0.4ms', ip: '192.168.1.101' },
+  { id: 'dev-2', name: 'MacBook Pro M3', type: 'Laptop', pos: [-5, 1.5, 2], color: 0x818cf8, rtt: '2.1ms', ip: '192.168.1.102' },
+  { id: 'dev-3', name: 'Google Pixel 9 Pro', type: 'Mobile (Wi-Fi 6)', pos: [4.5, -1, 3], color: 0x34d399, rtt: '3.8ms', ip: '192.168.1.105' },
+  { id: 'dev-4', name: 'iPad Pro 13"', type: 'Tablet', pos: [3.5, 3, -3], color: 0xc084fc, rtt: '4.2ms', ip: '192.168.1.108' },
+  { id: 'dev-5', name: 'Chrome Browser Ext', type: 'Extension Node', pos: [-4, -2.5, -2], color: 0xf59e0b, rtt: '1.2ms', ip: '127.0.0.1:9100' },
+];
+
 export default function NetworkMesh3D({ onSelectNode }) {
   const mountRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
+  const [webGLSupported, setWebGLSupported] = useState(true);
 
   useEffect(() => {
     const currentMount = mountRef.current;
     if (!currentMount) return;
+
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) {
+        setWebGLSupported(false);
+        return;
+      }
+    } catch {
+      setWebGLSupported(false);
+      return;
+    }
 
     const width = currentMount.clientWidth || 800;
     const height = currentMount.clientHeight || 450;
@@ -18,19 +39,19 @@ export default function NetworkMesh3D({ onSelectNode }) {
     camera.position.set(0, 5, 14);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch {
+      setWebGLSupported(false);
+      return;
+    }
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     currentMount.appendChild(renderer.domElement);
 
     // 2. Nodes Data (Mesh devices)
-    const nodes = [
-      { id: 'dev-1', name: 'Workstation Alpha', type: 'Desktop (Host)', pos: [0, 0, 0], color: 0x38bdf8, rtt: '0.4ms', ip: '192.168.1.101' },
-      { id: 'dev-2', name: 'MacBook Pro M3', type: 'Laptop', pos: [-5, 1.5, 2], color: 0x818cf8, rtt: '2.1ms', ip: '192.168.1.102' },
-      { id: 'dev-3', name: 'Google Pixel 9 Pro', type: 'Mobile (Wi-Fi 6)', pos: [4.5, -1, 3], color: 0x34d399, rtt: '3.8ms', ip: '192.168.1.105' },
-      { id: 'dev-4', name: 'iPad Pro 13"', type: 'Tablet', pos: [3.5, 3, -3], color: 0xc084fc, rtt: '4.2ms', ip: '192.168.1.108' },
-      { id: 'dev-5', name: 'Chrome Browser Ext', type: 'Extension Node', pos: [-4, -2.5, -2], color: 0xf59e0b, rtt: '1.2ms', ip: '127.0.0.1:9100' },
-    ];
+    const nodes = DEFAULT_NODES;
 
     const nodeObjects = [];
     const nodeGroup = new THREE.Group();
@@ -200,6 +221,63 @@ export default function NetworkMesh3D({ onSelectNode }) {
       renderer.dispose();
     };
   }, [onSelectNode]);
+
+  if (!webGLSupported) {
+    return (
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '380px',
+        borderRadius: '16px',
+        padding: '24px',
+        background: 'var(--color-surface-translucent, rgba(12, 16, 22, 0.7))',
+        border: '1px solid var(--border-metallic, rgba(255, 255, 255, 0.08))',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="pulse-dot"></span>
+          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-emerald, #34d399)', textTransform: 'uppercase' }}>
+            2D Topology Mesh Active (WebGL Fallback Mode)
+          </span>
+        </div>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', maxWidth: '440px' }}>
+          5 devices connected over LAN sockets (:9100). Low-power 2D layout active.
+        </p>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '12px',
+          width: '100%',
+          maxWidth: '820px',
+        }}>
+          {DEFAULT_NODES.map((node) => (
+            <div
+              key={node.id}
+              onClick={() => onSelectNode && onSelectNode(node.id)}
+              style={{
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: 'var(--bg-card, rgba(255, 255, 255, 0.04))',
+                border: '1px solid var(--border-glass, rgba(255, 255, 255, 0.08))',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{node.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.type}</div>
+              <div style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--color-emerald)', marginTop: '4px' }}>
+                {node.ip} • {node.rtt}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '420px', borderRadius: '16px', overflow: 'hidden' }}>

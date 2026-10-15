@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Layers, Laptop, FileText, Activity, Settings } from 'lucide-react';
+import { Layers, Laptop, FileText, Activity, Settings, Send } from 'lucide-react';
 
 export default function FloatingGlassDock({
   activeRoute,
@@ -14,10 +14,16 @@ export default function FloatingGlassDock({
       isActive: activeRoute === 'overview',
     },
     {
+      id: 'file-transfer',
+      label: 'Transfer',
+      icon: Send,
+      isActive: activeRoute === 'file-transfer',
+    },
+    {
       id: 'continuity',
       label: 'Continuity',
       icon: FileText,
-      isActive: ['continuity', 'workspaces', 'clipboard', 'file-transfer'].includes(activeRoute),
+      isActive: ['continuity', 'workspaces', 'clipboard'].includes(activeRoute),
     },
     {
       id: 'devices',
@@ -75,13 +81,19 @@ export default function FloatingGlassDock({
             <button
               key={item.id}
               onClick={() => onRouteChange(item.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-label={item.label}
               style={{
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '3px',
-                padding: '6px 14px',
+                justifyContent: 'center',
+                gap: '2px',
+                padding: '6px 10px',
+                minWidth: '44px',
+                minHeight: '44px',
                 borderRadius: '12px',
                 border: 'none',
                 background: 'transparent',

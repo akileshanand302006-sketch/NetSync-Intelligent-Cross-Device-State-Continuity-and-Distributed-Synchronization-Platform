@@ -8,22 +8,25 @@ import {
   Wifi,
   Server,
   Layers,
-  ArrowUpRight,
   Radio,
   Clock,
-  CheckCircle2,
   RefreshCw,
   Cpu,
-  BarChart2,
   Sliders,
   Send,
   Code2,
   Search,
   Users,
   Sparkles,
+  Compass,
+  Globe,
+  GitBranch,
+  Hash,
+  Share2,
 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
+import ProvenanceBadge from '../design-system/ProvenanceBadge';
 
 // Network Lab Modular Tabs
 import LiveConnectionsTab from '../network-lab/LiveConnectionsTab';
@@ -34,6 +37,28 @@ import ConnectivityDiagnosticsTab from '../network-lab/ConnectivityDiagnosticsTa
 import LanDiscoveryMulticastTab from '../network-lab/LanDiscoveryMulticastTab';
 import DhcpSimulationTab from '../network-lab/DhcpSimulationTab';
 import ExperimentsReportsTab from '../network-lab/ExperimentsReportsTab';
+
+// Tier A Network Intelligence Labs
+import RequestTracerTab from '../network-lab/RequestTracerTab';
+import CongestionControlTab from '../network-lab/CongestionControlTab';
+import ReliableTransportTab from '../network-lab/ReliableTransportTab';
+import ImpairmentStudioTab from '../network-lab/ImpairmentStudioTab';
+import DnsStudioTab from '../network-lab/DnsStudioTab';
+import DelayLossThroughputTab from '../network-lab/DelayLossThroughputTab';
+
+// Tier B Network Intelligence Labs
+import PathObservatoryTab from '../network-lab/PathObservatoryTab';
+import RoutingLabTab from '../network-lab/RoutingLabTab';
+import AddressArchitectTab from '../network-lab/AddressArchitectTab';
+import LinkLayerTab from '../network-lab/LinkLayerTab';
+import P2pSwarmDhtTab from '../network-lab/P2pSwarmDhtTab';
+import TimeClockSyncTab from '../network-lab/TimeClockSyncTab';
+
+// Tier C Deep Network Features
+import RouterArchitectureTab from '../network-lab/RouterArchitectureTab';
+import DatacenterFabricTab from '../network-lab/DatacenterFabricTab';
+import HttpEvolutionTab from '../network-lab/HttpEvolutionTab';
+import IcmpDiagnosticsTab from '../network-lab/IcmpDiagnosticsTab';
 
 export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
   const [activeLabTab, setActiveLabTab] = useState('overview');
@@ -63,6 +88,22 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
   const labTabs = [
     { id: 'overview', label: 'Network Overview', icon: Activity },
     { id: 'connections', label: 'Live Connections', icon: Radio },
+    { id: 'request_tracer', label: 'Life of Request (A1)', icon: Compass },
+    { id: 'congestion', label: 'Congestion Control (A2)', icon: Activity },
+    { id: 'reliable_transport', label: 'Reliable Transport (A3)', icon: Layers },
+    { id: 'impairment', label: 'Impairment Studio (A4)', icon: Sliders },
+    { id: 'dns_studio', label: 'DNS Studio (A5)', icon: Globe },
+    { id: 'delay_loss', label: 'Delay & Bufferbloat (A6)', icon: Clock },
+    { id: 'path_observatory', label: 'Path & BGP (B1)', icon: Compass },
+    { id: 'routing_lab', label: 'Routing Algorithms (B2)', icon: GitBranch },
+    { id: 'address_arch', label: 'Address Architect (B3)', icon: Hash },
+    { id: 'link_layer', label: 'Link Layer CSMA (B4)', icon: Radio },
+    { id: 'p2p_dht', label: 'P2P Swarm & DHT (B5)', icon: Share2 },
+    { id: 'time_sync', label: 'Clock Sync NTP (B6)', icon: Clock },
+    { id: 'router_arch', label: 'Router Fabric (C1)', icon: Cpu },
+    { id: 'datacenter', label: 'Datacenter Clos (C2)', icon: Server },
+    { id: 'http_evolution', label: 'HTTP Evolution (C3)', icon: Globe },
+    { id: 'icmp_ping', label: 'ICMP Diagnostics (C4)', icon: Activity },
     { id: 'sockets', label: 'Socket Toolkit', icon: Send },
     { id: 'concurrency', label: 'Server Performance', icon: Cpu },
     { id: 'packets', label: 'Packet Explorer', icon: Code2 },
@@ -72,18 +113,86 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
     { id: 'experiments', label: 'Capstone Reports', icon: Sparkles },
   ];
 
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const categories = [
+    { id: 'all', label: 'All Modules (25)' },
+    { id: 'tier_a', label: 'Tier A: Core Network (A1–A6)' },
+    { id: 'tier_b', label: 'Tier B: Routing & Infra (B1–B6)' },
+    { id: 'tier_c', label: 'Tier C: Deep Architecture (C1–C4)' },
+    { id: 'diagnostics', label: 'Diagnostics & Sockets (9)' },
+  ];
+
+  const categoryMap = {
+    tier_a: ['request_tracer', 'congestion', 'reliable_transport', 'impairment', 'dns_studio', 'delay_loss'],
+    tier_b: ['path_observatory', 'routing_lab', 'address_arch', 'link_layer', 'p2p_dht', 'time_sync'],
+    tier_c: ['router_arch', 'datacenter', 'http_evolution', 'icmp_ping'],
+    diagnostics: ['overview', 'connections', 'sockets', 'concurrency', 'packets', 'diagnostics', 'lan', 'dhcp', 'experiments'],
+  };
+
+  const visibleTabs = selectedCategory === 'all'
+    ? labTabs
+    : labTabs.filter((t) => categoryMap[selectedCategory]?.includes(t.id));
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Network Intelligence Lab Capsule Navigation */}
-      <SpatialGlassSurface style={{ padding: '8px 12px' }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          overflowX: 'auto',
-          paddingBottom: '2px',
-        }}>
-          {labTabs.map((tab) => {
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Category Filter Pills & Tab Capsule Navigation */}
+      <SpatialGlassSurface style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Category Pill Switcher */}
+        <div
+          role="tablist"
+          aria-label="Lab Categories"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {categories.map((cat) => {
+            const isCatActive = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                role="tab"
+                aria-selected={isCatActive}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.76rem',
+                  fontWeight: isCatActive ? 700 : 500,
+                  border: isCatActive ? '1px solid var(--border-emerald-glow)' : '1px solid var(--border-metallic-subtle)',
+                  background: isCatActive ? 'var(--color-emerald-dim)' : 'transparent',
+                  color: isCatActive ? 'var(--color-emerald)' : 'var(--text-muted)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease',
+                  minHeight: '34px',
+                }}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Modular Lab Tabs */}
+        <div
+          role="tablist"
+          aria-label="Network Intelligence Labs"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeLabTab === tab.id;
 
@@ -91,12 +200,16 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
               <button
                 key={tab.id}
                 onClick={() => setActiveLabTab(tab.id)}
+                role="tab"
+                aria-selected={isActive}
+                aria-label={tab.label}
                 style={{
                   position: 'relative',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                   padding: '7px 14px',
+                  minHeight: '38px',
                   borderRadius: '9999px',
                   fontSize: '0.82rem',
                   fontWeight: isActive ? 700 : 600,
@@ -179,7 +292,10 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
               <SpatialGlassSurface style={{ padding: '22px' }} glow>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Average Socket RTT</span>
-                  <Activity size={18} color="var(--color-emerald)" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ProvenanceBadge type="measured" detail="Direct high-resolution socket perf_counter round-trip time." />
+                    <Activity size={18} color="var(--color-emerald)" />
+                  </div>
                 </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                   1.9 <span style={{ fontSize: '1rem', color: 'var(--color-emerald)' }}>ms</span>
@@ -192,7 +308,10 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
               <SpatialGlassSurface style={{ padding: '22px' }} glow>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Delta Wire Savings</span>
-                  <Zap size={18} color="var(--color-mint)" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ProvenanceBadge type="derived" detail="Calculated: (Full Snapshot - Delta Payload) / Full Snapshot." />
+                    <Zap size={18} color="var(--color-mint)" />
+                  </div>
                 </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                   87.5 <span style={{ fontSize: '1rem', color: 'var(--color-mint)' }}>%</span>
@@ -205,7 +324,10 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
               <SpatialGlassSurface style={{ padding: '22px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>ACK Delivery Rate</span>
-                  <Shield size={18} color="#38bdf8" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ProvenanceBadge type="measured" detail="Observed from application-layer sliding window ACK tracker." />
+                    <Shield size={18} color="#38bdf8" />
+                  </div>
                 </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                   99.86 <span style={{ fontSize: '1rem', color: '#38bdf8' }}>%</span>
@@ -218,7 +340,10 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
               <SpatialGlassSurface style={{ padding: '22px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Wi-Fi 6 Mesh Jitter</span>
-                  <Wifi size={18} color="#a78bfa" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ProvenanceBadge type="derived" detail="RFC 3550 interarrival jitter variance over socket bursts." />
+                    <Wifi size={18} color="#a78bfa" />
+                  </div>
                 </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                   0.28 <span style={{ fontSize: '1rem', color: '#a78bfa' }}>ms</span>
@@ -384,16 +509,23 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
                           ±{p.jitter} ms
                         </td>
                         <td style={{ padding: '14px 16px' }}>
-                          <span style={{
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            background: 'rgba(69, 245, 154, 0.1)',
-                            color: 'var(--color-emerald)',
-                            fontSize: '0.72rem',
-                            fontWeight: 700,
-                          }}>
-                            {p.status}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              background: 'rgba(69, 245, 154, 0.1)',
+                              color: 'var(--color-emerald)',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                            }}>
+                              {p.status}
+                            </span>
+                            <ProvenanceBadge
+                              type={p.status === 'LOOPBACK' ? 'measured' : 'measured'}
+                              detail={`Empirical socket probe on ${p.ip}`}
+                              size="sm"
+                            />
+                          </div>
                         </td>
                         <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--color-emerald)', fontSize: '0.8rem', fontWeight: 600 }}>
@@ -502,6 +634,201 @@ export default function TelemetryView({ onTriggerSimulation, devices = [] }) {
             transition={{ duration: 0.18 }}
           >
             <ExperimentsReportsTab />
+          </motion.div>
+        )}
+
+        {/* Tier A Labs */}
+        {activeLabTab === 'request_tracer' && (
+          <motion.div
+            key="request_tracer"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <RequestTracerTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'congestion' && (
+          <motion.div
+            key="congestion"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <CongestionControlTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'reliable_transport' && (
+          <motion.div
+            key="reliable_transport"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <ReliableTransportTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'impairment' && (
+          <motion.div
+            key="impairment"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <ImpairmentStudioTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'dns_studio' && (
+          <motion.div
+            key="dns_studio"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <DnsStudioTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'delay_loss' && (
+          <motion.div
+            key="delay_loss"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <DelayLossThroughputTab />
+          </motion.div>
+        )}
+
+        {/* Tier B Labs */}
+        {activeLabTab === 'path_observatory' && (
+          <motion.div
+            key="path_observatory"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <PathObservatoryTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'routing_lab' && (
+          <motion.div
+            key="routing_lab"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <RoutingLabTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'address_arch' && (
+          <motion.div
+            key="address_arch"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <AddressArchitectTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'link_layer' && (
+          <motion.div
+            key="link_layer"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <LinkLayerTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'p2p_dht' && (
+          <motion.div
+            key="p2p_dht"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <P2pSwarmDhtTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'time_sync' && (
+          <motion.div
+            key="time_sync"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <TimeClockSyncTab />
+          </motion.div>
+        )}
+
+        {/* Tier C Labs */}
+        {activeLabTab === 'router_arch' && (
+          <motion.div
+            key="router_arch"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <RouterArchitectureTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'datacenter' && (
+          <motion.div
+            key="datacenter"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <DatacenterFabricTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'http_evolution' && (
+          <motion.div
+            key="http_evolution"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <HttpEvolutionTab />
+          </motion.div>
+        )}
+
+        {activeLabTab === 'icmp_ping' && (
+          <motion.div
+            key="icmp_ping"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <IcmpDiagnosticsTab />
           </motion.div>
         )}
       </AnimatePresence>

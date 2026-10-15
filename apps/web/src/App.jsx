@@ -4,6 +4,7 @@ import FloatingGlassNavbar from './components/design-system/FloatingGlassNavbar'
 import FloatingGlassDock from './components/design-system/FloatingGlassDock';
 import GlassCommandPalette from './components/design-system/GlassCommandPalette';
 import PairingModal from './components/PairingModal';
+import ConflictInspectorModal from './components/views/ConflictInspectorModal';
 import NetSyncFooter from './components/layout/NetSyncFooter';
 
 // Spatial Liquid Glass Page Views
@@ -79,6 +80,7 @@ export default function App() {
   const [isPairModalOpen, setIsPairModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [mouseParallax, setMouseParallax] = useState({ x: 0, y: 0 });
+  const [conflictModalData, setConflictModalData] = useState(null);
 
   // Mesh State
   const [devices, setDevices] = useState([]);
@@ -216,6 +218,22 @@ export default function App() {
         },
       };
       setLogs((prev) => [newEvt, ...prev]);
+      setConflictModalData({
+        mutation: {
+          diff: {
+            activeTab: 'https://datatracker.ietf.org/doc/html/rfc9293',
+            scroll: 82,
+            cursor: { line: 124, col: 12 },
+          },
+          expectedVersion: logs.length + 5,
+        },
+        serverState: {
+          activeTab: 'https://datatracker.ietf.org/doc/html/rfc9293',
+          scroll: 45,
+          cursor: { line: 88, col: 4 },
+        },
+        serverVersion: logs.length + 6,
+      });
     } else if (type === 'burst') {
       const newEvt = {
         id: `evt-${Date.now()}`,
@@ -237,6 +255,29 @@ export default function App() {
       };
       setLogs((prev) => [newEvt, ...prev]);
     }
+  };
+
+  const handleResolveConflict = (strategy) => {
+    const timeStr = new Date().toTimeString().split(' ')[0];
+    const resolutionEvt = {
+      id: `evt-${Date.now()}`,
+      timestamp: timeStr,
+      state: 'Conflict Resolved',
+      version: `Rev #${logs.length + 7}`,
+      type: 'resolution',
+      bytes: 64,
+      savings: '100%',
+      conflict: false,
+      strategy: strategy,
+      device: 'Workstation Alpha',
+      targetDevice: 'Server Gateway',
+      details: {
+        resolution_strategy: strategy,
+        status: 'Authoritative state synchronized',
+      },
+    };
+    setLogs((prev) => [resolutionEvt, ...prev]);
+    setConflictModalData(null);
   };
 
   const handlePushClipboard = async (newItem) => {
@@ -437,6 +478,14 @@ export default function App() {
         isOpen={isPairModalOpen}
         onClose={() => setIsPairModalOpen(false)}
         onDevicePaired={handleDevicePaired}
+      />
+
+      {/* Conflict Inspector Modal */}
+      <ConflictInspectorModal
+        isOpen={Boolean(conflictModalData)}
+        conflictData={conflictModalData}
+        onResolve={handleResolveConflict}
+        onClose={() => setConflictModalData(null)}
       />
     </div>
   );

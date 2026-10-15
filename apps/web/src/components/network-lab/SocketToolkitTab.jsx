@@ -1,18 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Radio,
-  Clock,
-  Zap,
-  Activity,
-  Shield,
-  RefreshCw,
-  Send,
-  AlertTriangle,
-  CheckCircle2,
-  Sliders,
-  TrendingDown,
-  Globe,
-} from 'lucide-react';
+import { Send, AlertTriangle } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
 import { runTcpProbe, runUdpProbe } from '../../services/api';
@@ -198,6 +185,21 @@ export default function SocketToolkitTab() {
                   max="20"
                   value={packetCount}
                   onChange={(e) => setPacketCount(Number(e.target.value))}
+                  style={{ width: '100%', marginTop: '6px' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  TIMEOUT ({timeoutSec.toFixed(1)}S)
+                </label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="5.0"
+                  step="0.5"
+                  value={timeoutSec}
+                  onChange={(e) => setTimeoutSec(Number(e.target.value))}
                   style={{ width: '100%', marginTop: '6px' }}
                 />
               </div>
