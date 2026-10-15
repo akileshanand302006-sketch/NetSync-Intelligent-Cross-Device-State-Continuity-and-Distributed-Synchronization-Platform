@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileCode,
   Plus,
@@ -18,6 +18,7 @@ import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
 import ProvenanceBadge from '../design-system/ProvenanceBadge';
 import { fetchWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from '../../services/api';
+import { broadcastMeshEvent, subscribeMeshEvents } from '../../services/meshChannel';
 
 const CODE_TEMPLATES = {
   delta: {
@@ -100,6 +101,7 @@ export default function WorkspacesView() {
   const [syncNotice, setSyncNotice] = useState(null);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [revisionHistory, setRevisionHistory] = useState([]);
+  const saveDebounceRef = useRef(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -137,6 +139,57 @@ export default function WorkspacesView() {
 
   useEffect(() => {
     loadWorkspaces();
+  }, []);
+
+  // Real-Time Cross-Tab & Same-Device Keystroke Synchronization
+  useEffect(() => {
+    const unsubscribe = subscribeMeshEvents((msg) => {
+      if (msg.type === 'WORKSPACE_BUFFER_UPDATE' && msg.payload) {
+        const { workspaceId, buffer, cursorPos: peerPos } = msg.payload;
+        if (workspaceId === activeWorkspaceId && buffer !== undefined) {
+          setEditorBuffer(buffer);
+          if (peerPos) setCursorPos(peerPos);
+          setSyncNotice({
+            type: 'success',
+            text: '⚡ Live keystroke synced from peer tab in real-time!',
+          });
+          setTimeout(() => setSyncNotice(null), 2500);
+        }
+      } else if (msg.type === 'WORKSPACE_SAVED' && msg.payload?.workspace) {
+        setWorkspaces((prev) => {
+          const exists = prev.some((w) => w.id === msg.payload.workspace.id);
+          if (exists) {
+            return prev.map((w) => (w.id === msg.payload.workspace.id ? msg.payload.workspace : w));
+          }
+          return [msg.payload.workspace, ...prev];
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [activeWorkspaceId]);
+
+  // Periodic background sync for distributed multi-device cloud authority (Supabase)
+  useEffect(() => {
+    const syncInterval = setInterval(async () => {
+      try {
+        const data = await fetchWorkspaces();
+        if (data && Array.isArray(data) && data.length > 0) {
+          setWorkspaces((prev) => {
+            // Check if any revision changed remotely
+            const hasUpdate = data.some((remoteW) => {
+              const localW = prev.find((w) => w.id === remoteW.id);
+              return !localW || (remoteW.version && remoteW.version > (localW.version || 0));
+            });
+            return hasUpdate ? data : prev;
+          });
+        }
+      } catch (e) {
+        // quiet fallback
+      }
+    }, 3500);
+
+    return () => clearInterval(syncInterval);
   }, []);
 
   const currentWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || workspaces[0];
@@ -275,14 +328,43 @@ export default function WorkspacesView() {
   };
 
   const handleTextareaChange = (e) => {
-    setEditorBuffer(e.target.value);
+    const val = e.target.value;
+    setEditorBuffer(val);
     const selStart = e.target.selectionStart;
-    const textUpToCursor = e.target.value.substring(0, selStart);
+    const textUpToCursor = val.substring(0, selStart);
     const lines = textUpToCursor.split('\n');
-    setCursorPos({
+    const newPos = {
       line: lines.length,
       col: lines[lines.length - 1].length + 1,
+    };
+    setCursorPos(newPos);
+
+    // 1. Instant cross-tab broadcast (Link to Windows / Moto Connect experience)
+    broadcastMeshEvent('WORKSPACE_BUFFER_UPDATE', {
+      workspaceId: currentWorkspace?.id,
+      buffer: val,
+      cursorPos: newPos,
+      time: Date.now(),
     });
+
+    // 2. Debounced auto-sync to 24/7 Supabase cloud authority
+    if (saveDebounceRef.current) {
+      clearTimeout(saveDebounceRef.current);
+    }
+    saveDebounceRef.current = setTimeout(async () => {
+      if (currentWorkspace?.id) {
+        try {
+          await updateWorkspace(currentWorkspace.id, {
+            editor_buffers: {
+              ...(currentWorkspace.editor_buffers || {}),
+              main: val,
+            },
+          });
+        } catch (err) {
+          console.warn('[Workspaces Auto-Save]:', err);
+        }
+      }
+    }, 1200);
   };
 
   const deltaBytes = Math.abs(editorBuffer.length - (CODE_TEMPLATES.delta.code.length || 0));

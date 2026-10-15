@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Zap, Laptop, Smartphone, Tablet, CheckCircle, RefreshCw, Search } from 'lucide-react';
+import { Zap, Laptop, Smartphone, Tablet, CheckCircle, RefreshCw, Search, Globe, Send, ExternalLink, Link2 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
 import LiquidGlassInput from '../design-system/LiquidGlassInput';
+import { broadcastMeshEvent } from '../../services/meshChannel';
 
 export default function ContinuityView({ onBeamHandoff }) {
   const [activeTabId, setActiveTabId] = useState('tab-1');
@@ -10,8 +11,9 @@ export default function ContinuityView({ onBeamHandoff }) {
   const [beaming, setBeaming] = useState(false);
   const [beamSuccess, setBeamSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [customUrl, setCustomUrl] = useState('');
 
-  const [tabs] = useState([
+  const [tabs, setTabs] = useState([
     { id: 'tab-1', title: 'RFC 9293 — Transmission Control Protocol Specification', url: 'https://datatracker.ietf.org/doc/html/rfc9293', scroll: 48, favicon: '🌐', device: 'Workstation Alpha' },
     { id: 'tab-2', title: 'NetSync Protocol Engine Architecture & Binary Framing', url: 'https://netsync.internal/docs/protocol', scroll: 82, favicon: '⚡', device: 'MacBook Pro M3' },
     { id: 'tab-3', title: 'Distributed Systems & Conflict-Free Replicated Data Types', url: 'https://research.distributed.io/crdt', scroll: 15, favicon: '📑', device: 'Google Pixel 9' },
@@ -19,28 +21,60 @@ export default function ContinuityView({ onBeamHandoff }) {
   ]);
 
   const devices = [
+    { id: 'dev-all', name: 'All Mesh Nodes (Broadcast)', icon: Globe, os: 'Multi-Device Distributed' },
     { id: 'dev-2', name: 'MacBook Pro M3', icon: Laptop, os: 'macOS Sonoma' },
     { id: 'dev-3', name: 'Pixel 9 Pro', icon: Smartphone, os: 'Android 15' },
     { id: 'dev-4', name: 'iPad Pro 13"', icon: Tablet, os: 'iPadOS 18' },
   ];
 
-  const handleBeam = () => {
+  const handleBeam = (targetTab = null) => {
     setBeaming(true);
     setBeamSuccess(false);
-    const activeTab = tabs.find(t => t.id === activeTabId);
+    const activeTab = targetTab || tabs.find(t => t.id === activeTabId);
 
     setTimeout(() => {
       setBeaming(false);
       setBeamSuccess(true);
+
+      const handoffPayload = {
+        tab: activeTab,
+        targetDevice: selectedTargetDevice,
+        scroll: activeTab?.scroll || 0,
+        senderDevice: 'This Device (Workstation Alpha)',
+      };
+
+      // Broadcast to all open tabs and devices instantly
+      broadcastMeshEvent('TAB_HANDOFF_BEAM', handoffPayload);
+
       if (onBeamHandoff) {
-        onBeamHandoff({
-          tab: activeTab,
-          targetDevice: selectedTargetDevice,
-          scroll: activeTab?.scroll || 0,
-        });
+        onBeamHandoff(handoffPayload);
       }
       setTimeout(() => setBeamSuccess(false), 3000);
-    }, 700);
+    }, 500);
+  };
+
+  const handleBeamCustomUrl = (e) => {
+    e.preventDefault();
+    if (!customUrl.trim()) return;
+
+    let formattedUrl = customUrl.trim();
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
+    const newTab = {
+      id: `custom-tab-${Date.now()}`,
+      title: formattedUrl.replace(/^https?:\/\//i, ''),
+      url: formattedUrl,
+      scroll: 0,
+      favicon: '🔗',
+      device: 'This Device (Custom Beam)',
+    };
+
+    setTabs((prev) => [newTab, ...prev]);
+    setActiveTabId(newTab.id);
+    handleBeam(newTab);
+    setCustomUrl('');
   };
 
   const filteredTabs = tabs.filter(t =>
@@ -59,12 +93,15 @@ export default function ContinuityView({ onBeamHandoff }) {
               <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-emerald)', textTransform: 'uppercase' }}>
                 CROSS-DEVICE CONTINUITY STUDIO
               </span>
+              <span className="badge-emerald-pill" style={{ fontSize: '0.7rem' }}>
+                Link to Windows & Moto Connect Experience
+              </span>
             </div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              Instant Spatial State Handoff
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: '4px 0' }}>
+              Instant Spatial State & URL Handoff
             </h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Continuously track and restore scroll coordinates, open tabs, and draft buffers across devices with zero context loss.
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+              Continuously beam and restore scroll coordinates, open browser tabs, and any web URLs across devices and browser tabs seamlessly.
             </p>
           </div>
 
@@ -79,15 +116,58 @@ export default function ContinuityView({ onBeamHandoff }) {
         </div>
       </SpatialGlassSurface>
 
+      {/* Beam Any URL / Link Card */}
+      <SpatialGlassSurface glow style={{ padding: '24px 28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+          <Globe size={20} color="var(--color-emerald)" />
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+            Beam Any URL to Connected Devices
+          </h3>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            (Instantly opens on recipient phone, laptop, or peer tabs)
+          </span>
+        </div>
+
+        <form onSubmit={handleBeamCustomUrl} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: '280px' }}>
+            <input
+              type="text"
+              value={customUrl}
+              onChange={(e) => setCustomUrl(e.target.value)}
+              placeholder="Type or paste any URL (e.g. https://youtube.com, https://github.com, etc.)..."
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid var(--border-metallic)',
+                color: 'var(--text-primary)',
+                fontSize: '0.9rem',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <LiquidGlassButton
+            type="submit"
+            variant="primary"
+            disabled={!customUrl.trim() || beaming}
+            icon={<Send size={15} />}
+          >
+            Beam URL Now
+          </LiquidGlassButton>
+        </form>
+      </SpatialGlassSurface>
+
       {/* Main Studio Layout */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '24px' }}>
         {/* Left: Active Tab Sessions */}
         <SpatialGlassSurface style={{ padding: '26px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
               Active Synchronized Tabs ({filteredTabs.length})
             </h3>
-            <span className="badge-emerald-pill">Sub-5ms Sync</span>
+            <span className="badge-emerald-pill">Sub-5ms Real-Time Sync</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -116,9 +196,26 @@ export default function ContinuityView({ onBeamHandoff }) {
                     {isSelected && <span className="badge-emerald-pill" style={{ fontSize: '0.62rem' }}>Selected</span>}
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     <span style={{ fontFamily: 'var(--font-mono)' }}>{tab.url}</span>
-                    <span style={{ color: 'var(--color-emerald)', fontWeight: 600 }}>Scroll: {tab.scroll}%</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(tab.url, '_blank');
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--color-emerald)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      <ExternalLink size={12} /> Open
+                    </button>
                   </div>
 
                   {/* Scroll Bar Visual */}
@@ -136,12 +233,12 @@ export default function ContinuityView({ onBeamHandoff }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
               <Zap size={20} color="var(--color-emerald)" />
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                 Target Beam Dispatch
               </h3>
             </div>
             <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '24px' }}>
-              Transmits binary state frame with exact URL and viewport scroll offset to the target peer via local TCP socket on port 9100.
+              Transmits binary state frame with exact URL and viewport coordinates to the target peer via BroadcastChannel and direct LAN sockets.
             </p>
 
             <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '10px' }}>
@@ -182,12 +279,12 @@ export default function ContinuityView({ onBeamHandoff }) {
             <LiquidGlassButton
               variant="primary"
               size="lg"
-              onClick={handleBeam}
+              onClick={() => handleBeam()}
               disabled={beaming}
               icon={beaming ? <RefreshCw size={18} className="animate-spin" /> : beamSuccess ? <CheckCircle size={18} /> : <Zap size={18} />}
               style={{ width: '100%' }}
             >
-              {beaming ? 'Transmitting Frame over Socket (:9100)...' : beamSuccess ? 'State Restored on Target Device!' : 'Beam Selected Session'}
+              {beaming ? 'Transmitting Frame over Mesh...' : beamSuccess ? 'Beamed! Restored on Target Device.' : 'Beam Selected Session'}
             </LiquidGlassButton>
           </div>
         </SpatialGlassSurface>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Clipboard,
@@ -20,12 +20,14 @@ import {
   Search,
   Lock,
   Clock,
+  Sparkles,
 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
 import LiquidGlassInput from '../design-system/LiquidGlassInput';
 import ProvenanceBadge from '../design-system/ProvenanceBadge';
 import { detectSensitiveContent } from '../../services/cryptoE2EE';
+import { broadcastMeshEvent, subscribeMeshEvents } from '../../services/meshChannel';
 
 export default function ClipboardView({ onPushClipboard }) {
   const [copiedId, setCopiedId] = useState(null);
@@ -33,8 +35,9 @@ export default function ClipboardView({ onPushClipboard }) {
   const [contentType, setContentType] = useState('text/plain');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [clipboardStatus, setClipboardStatus] = useState('');
 
-  const [items, setItems] = useState([
+  const DEFAULT_ITEMS = [
     {
       id: 'clip-1',
       device: 'MacBook Pro M3 Max',
@@ -85,7 +88,45 @@ export default function ClipboardView({ onPushClipboard }) {
       bytes: 88,
       pinned: false,
     },
-  ]);
+  ];
+
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('netsync_clipboard_items');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse saved clipboard:', e);
+    }
+    return DEFAULT_ITEMS;
+  });
+
+  // Save to localStorage whenever items change
+  useEffect(() => {
+    try {
+      localStorage.setItem('netsync_clipboard_items', JSON.stringify(items));
+    } catch (e) {
+      console.warn('Failed to cache clipboard:', e);
+    }
+  }, [items]);
+
+  // Subscribe to real-time Mesh Clipboard events from other devices / tabs
+  useEffect(() => {
+    const unsubscribe = subscribeMeshEvents((event) => {
+      if (event.type === 'CLIPBOARD_ITEM_PUSHED' && event.payload) {
+        const incoming = event.payload;
+        setItems((prev) => {
+          if (prev.some((it) => it.id === incoming.id || it.content === incoming.content)) {
+            return prev;
+          }
+          return [incoming, ...prev];
+        });
+        setClipboardStatus(`Synced new payload from ${incoming.device || 'Peer'}`);
+        setTimeout(() => setClipboardStatus(''), 4000);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const getDeviceIcon = (type) => {
     switch (type) {
@@ -114,19 +155,71 @@ export default function ClipboardView({ onPushClipboard }) {
 
   const handleSend = () => {
     if (!newContent.trim()) return;
+    const isUrl = /^https?:\/\//i.test(newContent.trim());
+    const isJson = (newContent.trim().startsWith('{') && newContent.trim().endsWith('}')) ||
+                   (newContent.trim().startsWith('[') && newContent.trim().endsWith(']'));
+    const detectedType = contentType !== 'text/plain' ? contentType : (isUrl ? 'url' : isJson ? 'application/json' : 'text/plain');
+
     const newItem = {
       id: `clip-${Date.now()}`,
       device: 'Workstation Alpha (This device)',
       deviceType: 'desktop',
       content: newContent,
-      type: contentType,
+      type: detectedType,
       time: 'Just now',
       bytes: new Blob([newContent]).size,
       pinned: false,
     };
-    setItems([newItem, ...items]);
+
+    setItems((prev) => [newItem, ...prev]);
+    broadcastMeshEvent('CLIPBOARD_ITEM_PUSHED', newItem);
     if (onPushClipboard) onPushClipboard(newItem);
     setNewContent('');
+    setClipboardStatus('Broadcasted across hardware mesh');
+    setTimeout(() => setClipboardStatus(''), 3000);
+  };
+
+  const handleSyncSystemClipboard = async () => {
+    try {
+      if (!navigator.clipboard?.readText) {
+        setClipboardStatus('System clipboard API unavailable in this browser');
+        return;
+      }
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()) {
+        setClipboardStatus('System clipboard is currently empty');
+        setTimeout(() => setClipboardStatus(''), 3000);
+        return;
+      }
+      const isUrl = /^https?:\/\//i.test(text.trim());
+      const isJson = (text.trim().startsWith('{') && text.trim().endsWith('}')) ||
+                     (text.trim().startsWith('[') && text.trim().endsWith(']'));
+      const type = isUrl ? 'url' : isJson ? 'application/json' : 'text/plain';
+
+      const newItem = {
+        id: `clip-${Date.now()}`,
+        device: 'Workstation Alpha (System Clipboard)',
+        deviceType: 'desktop',
+        content: text,
+        type: type,
+        time: 'Just now',
+        bytes: new Blob([text]).size,
+        pinned: false,
+      };
+
+      setItems((prev) => {
+        if (prev.some((it) => it.content === text)) return prev;
+        return [newItem, ...prev];
+      });
+      broadcastMeshEvent('CLIPBOARD_ITEM_PUSHED', newItem);
+      if (onPushClipboard) onPushClipboard(newItem);
+      setClipboardStatus('Successfully captured & synced OS system clipboard!');
+      setTimeout(() => setClipboardStatus(''), 3500);
+    } catch (err) {
+      console.warn('Clipboard read error:', err);
+      setClipboardStatus('Clipboard access denied. Click anywhere and press Ctrl+V to paste.');
+      setTimeout(() => setClipboardStatus(''), 4000);
+    }
   };
 
   const handleTogglePin = (id) => {
@@ -170,7 +263,31 @@ export default function ClipboardView({ onPushClipboard }) {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {clipboardStatus && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                background: 'rgba(69, 245, 154, 0.15)',
+                border: '1px solid rgba(69, 245, 154, 0.4)',
+                color: 'var(--color-emerald)',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+              }}>
+                <Sparkles size={14} /> {clipboardStatus}
+              </span>
+            )}
+            <LiquidGlassButton
+              variant="secondary"
+              onClick={handleSyncSystemClipboard}
+              icon={<Clipboard size={14} />}
+              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+            >
+              Sync System Clipboard
+            </LiquidGlassButton>
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',

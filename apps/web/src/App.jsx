@@ -28,6 +28,8 @@ import {
   registerDevice,
   revokeDevice,
 } from './services/api';
+import { ExternalLink, Sparkles, X, Download } from 'lucide-react';
+import { subscribeMeshEvents } from './services/meshChannel';
 
 
 // SPA Route Definitions and Titles
@@ -84,6 +86,7 @@ export default function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [mouseParallax, setMouseParallax] = useState({ x: 0, y: 0 });
   const [conflictModalData, setConflictModalData] = useState(null);
+  const [meshToast, setMeshToast] = useState(null);
 
   // Mesh State
   const [devices, setDevices] = useState([]);
@@ -176,6 +179,121 @@ export default function App() {
     return () => {
       mounted = false;
     };
+  }, []);
+
+  // Auto-dismiss Toast Timer
+  useEffect(() => {
+    if (!meshToast) return;
+    const t = setTimeout(() => setMeshToast(null), 8000);
+    return () => clearTimeout(t);
+  }, [meshToast]);
+
+  // Real-Time Hardware Mesh Event Listener (Cross-Device & Cross-Tab)
+  useEffect(() => {
+    const unsubscribe = subscribeMeshEvents((event) => {
+      if (!event || !event.type) return;
+
+      if (event.type === 'DEVICE_PAIRED' && event.payload) {
+        const newDev = event.payload;
+        setDevices((prev) => {
+          const devExists = prev.some((d) => d.id === newDev.id || (d.device_name && d.device_name === newDev.name));
+          if (devExists) return prev;
+          const normalized = {
+            id: newDev.id || `dev-${Date.now()}`,
+            device_name: newDev.name || 'Hardware Peer',
+            device_type: newDev.type || 'phone',
+            os: newDev.os || 'Android 15',
+            ip_address: newDev.ip || '192.168.1.118',
+            port: 9100,
+            is_online: true,
+            is_trusted: true,
+            last_seen: 'Now',
+          };
+          return [normalized, ...prev];
+        });
+
+        const timeStr = new Date().toTimeString().split(' ')[0];
+        setLogs((prev) => [
+          {
+            id: `evt-${Date.now()}`,
+            timestamp: timeStr,
+            state: `Peer Joined: ${newDev.name || 'Hardware Peer'}`,
+            version: `Rev #${prev.length + 1}`,
+            type: 'handshake',
+            bytes: 128,
+            savings: '100%',
+            conflict: false,
+            strategy: 'e2ee_trusted_exchange',
+            device: newDev.name || 'Hardware Peer',
+            targetDevice: 'Local Host Node',
+          },
+          ...prev,
+        ]);
+
+        setMeshToast({
+          id: `toast-${Date.now()}`,
+          type: 'device',
+          title: 'New Hardware Peer Paired',
+          message: `${newDev.name || 'New Device'} joined your secure NetSync hardware mesh!`,
+          actionLabel: 'View Devices',
+          onAction: () => handleNavigate('devices'),
+        });
+      } else if (event.type === 'TAB_HANDOFF_BEAM' && event.payload) {
+        const handoff = event.payload;
+        setMeshToast({
+          id: `toast-${Date.now()}`,
+          type: 'beam',
+          title: `Incoming URL from ${handoff.senderDevice || 'Mesh Peer'}`,
+          message: handoff.url,
+          actionLabel: 'Open Link ↗',
+          onAction: () => {
+            window.open(handoff.url, '_blank', 'noopener,noreferrer');
+            setMeshToast(null);
+          },
+        });
+      } else if (event.type === 'P2P_FILE_OFFER' && event.payload) {
+        const fileOffer = event.payload;
+        setMeshToast({
+          id: `toast-${Date.now()}`,
+          type: 'file',
+          title: `Incoming File: ${fileOffer.fileName}`,
+          message: `${(fileOffer.fileSize / (1024 * 1024)).toFixed(2)} MB from ${fileOffer.senderDevice}`,
+          actionLabel: 'Receive File →',
+          onAction: () => {
+            handleNavigate('file-transfer');
+            setMeshToast(null);
+          },
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [handleNavigate]);
+
+  // Distributed Background Device Sync Polling (Multi-Device DB Sync)
+  useEffect(() => {
+    const pollTimer = setInterval(async () => {
+      try {
+        const remoteDevices = await fetchDevices();
+        if (remoteDevices && Array.isArray(remoteDevices) && remoteDevices.length > 0) {
+          setDevices((prev) => {
+            const prevMap = new Map(prev.map((d) => [d.id, d]));
+            let changed = false;
+            for (const rd of remoteDevices) {
+              if (!prevMap.has(rd.id) || prevMap.get(rd.id)?.is_online !== rd.is_online) {
+                changed = true;
+                break;
+              }
+            }
+            return changed ? remoteDevices : prev;
+          });
+        }
+      } catch (e) {
+        // Keep current state on network interruptions
+      }
+    }, 3500);
+
+    return () => clearInterval(pollTimer);
   }, []);
 
   // Global Keyboard Shortcuts (Cmd+K / Ctrl+K)
@@ -537,6 +655,104 @@ export default function App() {
         onResolve={handleResolveConflict}
         onClose={() => setConflictModalData(null)}
       />
+
+      {/* Global Cross-Device Mesh Floating Toast Notification */}
+      <AnimatePresence>
+        {meshToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              top: '84px',
+              right: '28px',
+              zIndex: 9999,
+              maxWidth: '420px',
+              width: 'calc(100% - 56px)',
+              padding: '16px 20px',
+              borderRadius: '16px',
+              background: 'rgba(10, 14, 18, 0.92)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(69, 245, 154, 0.35)',
+              boxShadow: '0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(69, 245, 154, 0.2)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '14px',
+            }}
+          >
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'rgba(69, 245, 154, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--color-emerald)',
+                flexShrink: 0,
+                marginTop: '2px',
+              }}
+            >
+              {meshToast.type === 'file' ? (
+                <Download size={18} />
+              ) : meshToast.type === 'beam' ? (
+                <ExternalLink size={18} />
+              ) : (
+                <Sparkles size={18} />
+              )}
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                <span className="pulse-emerald-dot" style={{ width: '6px', height: '6px' }} />
+                <h4 style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                  {meshToast.title}
+                </h4>
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 10px 0', wordBreak: 'break-all', lineHeight: 1.4 }}>
+                {meshToast.message}
+              </p>
+
+              {meshToast.actionLabel && (
+                <button
+                  onClick={meshToast.onAction}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, rgba(69, 245, 154, 0.2), rgba(6, 182, 212, 0.2))',
+                    border: '1px solid rgba(69, 245, 154, 0.4)',
+                    color: 'var(--color-emerald)',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  {meshToast.actionLabel}
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setMeshToast(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '2px',
+              }}
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

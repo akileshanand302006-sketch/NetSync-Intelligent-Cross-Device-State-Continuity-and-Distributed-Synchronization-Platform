@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import SpatialGlassSurface from '../design-system/SpatialGlassSurface';
 import LiquidGlassButton from '../design-system/LiquidGlassButton';
+import { testBroadcastDiscovery, testMulticastDiscovery } from '../../services/api';
 
 export default function LanDiscoveryMulticastTab() {
   const [activeTab, setActiveTab] = useState('broadcast'); // 'broadcast' | 'multicast'
@@ -34,10 +35,7 @@ export default function LanDiscoveryMulticastTab() {
   const handleRunBroadcast = async () => {
     setIsBroadcasting(true);
     try {
-      const res = await fetch(`/api/v1/lab/discovery/broadcast?port=${broadcastPort}`, {
-        method: 'POST',
-      });
-      const data = await res.json();
+      const data = await testBroadcastDiscovery(broadcastPort);
       setBroadcastResult(data);
     } catch (err) {
       console.error(err);
@@ -49,17 +47,12 @@ export default function LanDiscoveryMulticastTab() {
   const handleRunMulticast = async () => {
     setIsMulticasting(true);
     try {
-      const res = await fetch('/api/v1/lab/discovery/multicast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          group: multicastGroup,
-          port: Number(multicastPort),
-          ttl: Number(multicastTtl),
-          message_count: Number(messageCount),
-        }),
+      const data = await testMulticastDiscovery({
+        group: multicastGroup,
+        port: Number(multicastPort),
+        ttl: Number(multicastTtl),
+        message_count: Number(messageCount),
       });
-      const data = await res.json();
       setMulticastResult(data);
     } catch (err) {
       console.error(err);
