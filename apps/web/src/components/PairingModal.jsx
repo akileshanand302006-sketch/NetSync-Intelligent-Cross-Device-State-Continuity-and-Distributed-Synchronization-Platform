@@ -13,6 +13,8 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
   const [inputCode, setInputCode] = useState('');
   const [trustLevel, setTrustLevel] = useState('TRUSTED_HARDWARE'); // TRUSTED_HARDWARE | PROVISIONAL_GUEST
   const [pairingSuccess, setPairingSuccess] = useState(false);
+  const [peerName, setPeerName] = useState('Google Pixel 9 Pro');
+  const [peerType, setPeerType] = useState('phone');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -37,8 +39,8 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
       setTimeout(() => {
         if (onDevicePaired) {
           onDevicePaired({
-            name: 'New Hardware Peer',
-            type: 'Mobile Client',
+            name: peerName.trim() || 'New Hardware Peer',
+            type: peerType,
             code: inputCode,
             trustLevel: trustLevel,
             isTrusted: trustLevel === 'TRUSTED_HARDWARE',
@@ -47,9 +49,10 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
         onClose();
         setPairingSuccess(false);
         setInputCode('');
-      }, 1200);
+      }, 1000);
     }
   };
+
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = (timeLeft % 60).toString().padStart(2, '0');
@@ -186,20 +189,69 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
                 </div>
               </div>
 
-              <LiquidGlassButton
-                variant="secondary"
-                onClick={handleGenerateNew}
-                icon={<RefreshCw size={14} />}
-                style={{ width: '100%', marginBottom: '14px' }}
-              >
-                Regenerate Token
-              </LiquidGlassButton>
+              <div style={{ display: 'flex', gap: '10px', width: '100%', marginBottom: '14px' }}>
+                <LiquidGlassButton
+                  variant="secondary"
+                  onClick={handleGenerateNew}
+                  icon={<RefreshCw size={14} />}
+                  style={{ flex: 1 }}
+                >
+                  Regenerate
+                </LiquidGlassButton>
+                <LiquidGlassButton
+                  variant="primary"
+                  onClick={() => {
+                    setPairingSuccess(true);
+                    setTimeout(() => {
+                      if (onDevicePaired) {
+                        onDevicePaired({
+                          name: 'Google Pixel 9 Pro',
+                          type: 'phone',
+                          os: 'Android 15',
+                          code: token,
+                          trustLevel: 'TRUSTED_HARDWARE',
+                          isTrusted: true,
+                        });
+                      }
+                      onClose();
+                      setPairingSuccess(false);
+                    }, 1000);
+                  }}
+                  icon={<ShieldCheck size={14} />}
+                  style={{ flex: 1.3 }}
+                >
+                  Pair Peer Device
+                </LiquidGlassButton>
+              </div>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Enter this 6-digit code on your secondary device to establish an authenticated P2P socket channel.
+                Enter this 6-digit code on your secondary device, or click "Pair Peer Device" to simulate incoming hardware handshake.
               </span>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Device Name:
+                </label>
+                <input
+                  type="text"
+                  value={peerName}
+                  onChange={(e) => setPeerName(e.target.value)}
+                  placeholder="e.g. MacBook Pro M3 Max"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid var(--border-metallic)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
                   6-Digit Code displayed on Host peer:
@@ -227,6 +279,7 @@ export default function PairingModal({ isOpen, onClose, onDevicePaired }) {
                   }}
                 />
               </div>
+
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>

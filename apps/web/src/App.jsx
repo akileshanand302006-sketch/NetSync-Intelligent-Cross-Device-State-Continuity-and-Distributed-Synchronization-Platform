@@ -25,7 +25,10 @@ import {
   fetchNetworkSummary,
   fetchSyncHistory,
   pushClipboardItem,
+  registerDevice,
+  revokeDevice,
 } from './services/api';
+
 
 // SPA Route Definitions and Titles
 const VALID_ROUTES = [
@@ -280,6 +283,71 @@ export default function App() {
     setConflictModalData(null);
   };
 
+  const handleDevicePaired = async (newDeviceData) => {
+    try {
+      const typeStr = (newDeviceData.type || 'phone').toLowerCase();
+      const devType = typeStr.includes('tablet')
+        ? 'tablet'
+        : typeStr.includes('laptop') || typeStr.includes('desktop')
+        ? 'laptop'
+        : 'phone';
+
+      const registered = await registerDevice({
+        device_name: newDeviceData.name || 'New Hardware Peer',
+        device_type: devType,
+        os: newDeviceData.os || (devType === 'tablet' ? 'iPadOS 18.1' : devType === 'laptop' ? 'macOS 15 Sequoia' : 'Android 15'),
+        browser: 'NetSync Native Client',
+        ip_address: '192.168.1.' + Math.floor(110 + Math.random() * 100),
+        port: 9100,
+      });
+
+      const newDev = registered || {
+        id: `dev-${Date.now()}`,
+        device_name: newDeviceData.name || 'New Hardware Peer',
+        device_type: devType,
+        os: 'Android 15',
+        ip_address: '192.168.1.115',
+        port: 9100,
+        is_online: true,
+        is_trusted: true,
+        last_seen: 'Now',
+      };
+
+      setDevices((prev) => [newDev, ...prev]);
+
+      const timeStr = new Date().toTimeString().split(' ')[0];
+      setLogs((prev) => [
+        {
+          id: `evt-${Date.now()}`,
+          timestamp: timeStr,
+          state: `Device Paired: ${newDev.device_name}`,
+          version: `Rev #${prev.length + 1}`,
+          type: 'handshake',
+          bytes: 128,
+          savings: '100%',
+          conflict: false,
+          strategy: 'e2ee_trusted_exchange',
+          device: newDev.device_name,
+          targetDevice: 'Local Node',
+        },
+        ...prev,
+      ]);
+    } catch (e) {
+      console.error('Error adding paired device:', e);
+    }
+  };
+
+  const handleRevokeDevice = async (deviceId) => {
+    try {
+      await revokeDevice(deviceId);
+      setDevices((prev) => prev.filter((d) => d.id !== deviceId));
+    } catch (e) {
+      console.error('Error revoking device:', e);
+      setDevices((prev) => prev.filter((d) => d.id !== deviceId));
+    }
+  };
+
+
   const handlePushClipboard = async (newItem) => {
     const timeStr = new Date().toTimeString().split(' ')[0];
     setLogs((prev) => [
@@ -322,24 +390,6 @@ export default function App() {
     ]);
   };
 
-  const handleRevokeDevice = (deviceId) => {
-    setDevices((prev) => prev.filter((d) => d.id !== deviceId));
-  };
-
-  const handleDevicePaired = (newDevice) => {
-    const created = {
-      id: `dev-${Date.now()}`,
-      device_name: newDevice.name || 'New Hardware Peer',
-      device_type: newDevice.type?.toLowerCase().includes('phone') ? 'phone' : 'laptop',
-      os: 'NetSync OS 2.4',
-      ip_address: '192.168.1.112',
-      port: 9100,
-      is_online: true,
-      is_trusted: true,
-      last_seen: 'Now',
-    };
-    setDevices((prev) => [...prev, created]);
-  };
 
   return (
     <div className="cinematic-viewport" onMouseMove={handleMouseMove}>
